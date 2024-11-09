@@ -126,7 +126,7 @@ const SkillItem = styled(Box)(({ highContrast }) => ({
   fontSize: '0.9rem',
 }));
 
-const CenteredButton = styled(Button)(({ highContrast }) => ({
+const CenteredButton = styled(Button)(({ highContrast, fontSize }) => ({
   display: 'block',
   margin: '1.5rem auto',
   backgroundColor: highContrast ? '#FFD700' : '#007bff',
