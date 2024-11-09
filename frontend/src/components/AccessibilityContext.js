@@ -1,7 +1,7 @@
-// AccessibilityContext.js
+// src/contexts/AccessibilityContext.js
 import React, { createContext, useState, useEffect } from 'react';
 
-const AccessibilityContext = createContext();
+export const AccessibilityContext = createContext();
 
 export const AccessibilityProvider = ({ children }) => {
   const [highContrast, setHighContrast] = useState(false);
@@ -17,19 +17,12 @@ export const AccessibilityProvider = ({ children }) => {
   useEffect(() => {
     localStorage.setItem('highContrast', highContrast);
     localStorage.setItem('fontSize', fontSize);
+    document.documentElement.style.setProperty('--app-font-size', `${fontSize}px`);
   }, [highContrast, fontSize]);
 
-  const toggleHighContrast = () => {
-    setHighContrast(!highContrast);
-  };
-
-  const increaseFontSize = () => {
-    setFontSize((prevSize) => Math.min(prevSize + 2, 24));
-  };
-
-  const decreaseFontSize = () => {
-    setFontSize((prevSize) => Math.max(prevSize - 2, 12));
-  };
+  const toggleHighContrast = () => setHighContrast(!highContrast);
+  const increaseFontSize = () => setFontSize((prevSize) => Math.min(prevSize + 2, 24));
+  const decreaseFontSize = () => setFontSize((prevSize) => Math.max(prevSize - 2, 12));
 
   return (
     <AccessibilityContext.Provider
@@ -45,5 +38,3 @@ export const AccessibilityProvider = ({ children }) => {
     </AccessibilityContext.Provider>
   );
 };
-
-export default AccessibilityContext;

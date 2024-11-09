@@ -1,27 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { AppBar, Toolbar, Button, Typography, Container, Box, IconButton, Avatar } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { Button, Typography, Container, Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import BookmarkIcon from '@mui/icons-material/Bookmark';
-import MessageIcon from '@mui/icons-material/Message';
-
-const NavBar = styled(AppBar)(({ highContrast }) => ({
-  backgroundColor: highContrast ? '#000' : '#007bff',
-  marginBottom: '2rem',
-  color: highContrast ? '#fff' : '#fff',
-}));
-
-const NavButton = styled(Button)(({ active, ishome, highContrast }) => ({
-  color: highContrast ? (ishome ? '#FFD700' : active ? '#FFD700' : '#fff') : ishome ? '#FF9000' : active ? '#002DFF' : '#fff',
-  marginLeft: '1rem',
-}));
-
-const IconSection = styled(Box)({
-  marginLeft: 'auto',
-  display: 'flex',
-  alignItems: 'center',
-});
+import EmployerNavBar from './EmployerNavBar';
 
 const CenteredBox = styled(Box)(({ highContrast }) => ({
   display: 'flex',
@@ -56,15 +37,12 @@ const AccessibilityBar = styled(Box)({
 
 const EmployerHomePage = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const [highContrast, setHighContrast] = useState(false);
   const [fontSize, setFontSize] = useState(16);
 
   const handleGetStartedClick = () => {
     navigate('/posting-jobs'); // Redirect to the Posting Jobs Page
   };
-
-  const checkActive = (path) => location.pathname === path; // Function to check active page
 
   useEffect(() => {
     const savedHighContrast = localStorage.getItem('highContrast') === 'true';
@@ -92,59 +70,7 @@ const EmployerHomePage = () => {
 
   return (
     <div style={{ fontSize: `${fontSize}px` }}>
-      {/* Navigation Bar */}
-      <NavBar highContrast={highContrast} position="static">
-        <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'center' }}>
-            Inclusive Job Portal
-          </Typography>
-          <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
-            <NavButton highContrast={highContrast} ishome={checkActive('/employer-home')} onClick={() => navigate('/employer-home')}>
-              Home
-            </NavButton>
-            <NavButton highContrast={highContrast} active={checkActive('/posting-jobs')} onClick={handleGetStartedClick}>
-              Post Jobs
-            </NavButton>
-            <NavButton highContrast={highContrast} active={checkActive('/employer-manage-profile')} onClick={() => navigate('/employer-manage-profile')}>
-              Manage Profile
-            </NavButton>
-            <NavButton highContrast={highContrast} active={checkActive('/manage-applications')} onClick={() => navigate('/manage-applications')}>
-              Manage Applications
-            </NavButton>
-            <NavButton highContrast={highContrast} active={checkActive('/shortlisted-candidates')} onClick={() => navigate('/shortlisted-candidates')}>
-              Shortlisted Candidates
-            </NavButton>
-            <NavButton highContrast={highContrast} active={checkActive('/skill-assessment')} onClick={() => navigate('/skill-assessment')}>
-              Skill Assessment
-            </NavButton>
-            <NavButton highContrast={highContrast} active={checkActive('/learning-resources')} onClick={() => navigate('/learning-resources')}>
-              Learning Resources
-            </NavButton>
-            <NavButton highContrast={highContrast} active={checkActive('/accessibility-features')} onClick={() => navigate('/accessibility-features')}>
-              Accessibility Features
-            </NavButton>
-          </Box>
-
-          {/* Icons Section */}
-          <IconSection>
-            <IconButton color="inherit" onClick={() => navigate('/notifications')}>
-              <NotificationsIcon />
-            </IconButton>
-
-            <IconButton color="inherit" onClick={() => navigate('/saved-jobs')}>
-              <BookmarkIcon />
-            </IconButton>
-
-            <IconButton color="inherit" onClick={() => navigate('/messages')}>
-              <MessageIcon />
-            </IconButton>
-
-            <IconButton color="inherit" onClick={() => navigate('/manage-profile')}>
-              <Avatar alt="User Profile" src="/profile-pic.jpg" />
-            </IconButton>
-          </IconSection>
-        </Toolbar>
-      </NavBar>
+      <EmployerNavBar activePage="Home" />
 
       <Container>
         <CenteredBox highContrast={highContrast}>
@@ -154,21 +80,40 @@ const EmployerHomePage = () => {
           <Typography variant="body1" paragraph>
             The Inclusive Job Portal is designed to make job hunting accessible to everyone. Whether you're a job seeker or an employer, we provide tools that ensure a seamless experience.
           </Typography>
-          <GetStartedButton highContrast={highContrast} onClick={handleGetStartedClick}>
+          <GetStartedButton 
+            highContrast={highContrast} 
+            data-command="Get Started" 
+            onClick={handleGetStartedClick}
+            aria-label="Get started by posting jobs"
+          >
             Get Started
           </GetStartedButton>
         </CenteredBox>
       </Container>
 
       {/* Accessibility Bar */}
-      <AccessibilityBar>
-        <Button variant="contained" onClick={toggleHighContrast} sx={{ marginRight: '1rem' }}>
+      <AccessibilityBar aria-label="Accessibility options">
+        <Button 
+          variant="contained" 
+          onClick={toggleHighContrast} 
+          sx={{ marginRight: '1rem' }}
+          aria-label="Toggle high contrast mode"
+        >
           Toggle High Contrast
         </Button>
-        <Button variant="contained" onClick={increaseFontSize} sx={{ marginRight: '1rem' }}>
+        <Button 
+          variant="contained" 
+          onClick={increaseFontSize} 
+          sx={{ marginRight: '1rem' }}
+          aria-label="Increase font size"
+        >
           Increase Font Size
         </Button>
-        <Button variant="contained" onClick={decreaseFontSize}>
+        <Button 
+          variant="contained" 
+          onClick={decreaseFontSize}
+          aria-label="Decrease font size"
+        >
           Decrease Font Size
         </Button>
       </AccessibilityBar>

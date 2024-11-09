@@ -1,28 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { TextField, Button, Typography, Box, Toolbar, Avatar, IconButton } from '@mui/material';
+import { TextField, Button, Typography, Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { storage, db, auth } from '../firebase'; // Firebase setup
+import { storage, db, auth } from '../firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { collection, addDoc, doc, getDoc, updateDoc  } from 'firebase/firestore'; // Ensure getDoc is imported
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import BookmarkIcon from '@mui/icons-material/Bookmark';
-import MessageIcon from '@mui/icons-material/Message';
-
-const NavBar = styled('div')(({ highContrast }) => ({
-  backgroundColor: highContrast ? '#000' : '#007bff',
-  padding: '0rem',
-  color: highContrast ? '#fff' : '#fff',
-  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-}));
-
-const NavButton = styled(Button)(({ isActive, isSearchJobs, highContrast }) => ({
-  color: highContrast ? (isSearchJobs ? '#FFD700' : isActive ? '#FFD700' : '#fff') : isSearchJobs ? '#FF9000' : isActive ? '#002DFF' : '#fff',
-  marginRight: '1rem',
-  '&:hover': {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-  },
-}));
+import { collection, addDoc, doc, getDoc, updateDoc } from 'firebase/firestore';
+import UserNavBar from './UserNavBar';
 
 const PageContainer = styled(Box)({
   display: 'flex',
@@ -67,7 +50,6 @@ const JobApplicationPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Get jobTitle and company from location.state or default values
   const { jobTitle, company } = location.state || { jobTitle: 'Software Engineer', company: 'Tech Corp' };
 
   const [formData, setFormData] = useState({
@@ -87,7 +69,6 @@ const JobApplicationPage = () => {
   const [highContrast, setHighContrast] = useState(false);
   const [fontSize, setFontSize] = useState(16);
 
-  // Fetch current user's data (first name, last name, email) from Firestore
   useEffect(() => {
     const fetchUserData = async () => {
       const user = auth.currentUser;
@@ -144,47 +125,41 @@ const JobApplicationPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    // Check if all required fields are filled
+
     if (!formData.phone || !formData.address || !formData.state || !formData.country || !formData.zip || !resume || !coverLetter) {
       setError('Please fill in all mandatory fields.');
       return;
     }
-  
+
     try {
       const date = new Date();
       const year = date.getFullYear();
-      const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Ensure 2 digits
-      const day = date.getDate().toString().padStart(2, '0'); // Ensure 2 digits
-  
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const day = date.getDate().toString().padStart(2, '0');
       const folderPath = `employers/${company}/${jobTitle}/${year}/${month}/${day}/${formData.firstName}-${formData.lastName}/`;
-  
-      // Upload resume and cover letter to Firebase Storage
+
       const resumeRef = ref(storage, `${folderPath}resume.pdf`);
       const coverLetterRef = ref(storage, `${folderPath}cover-letter.pdf`);
-  
+
       await uploadBytes(resumeRef, resume);
       await uploadBytes(coverLetterRef, coverLetter);
-  
+
       const resumeURL = await getDownloadURL(resumeRef);
       const coverLetterURL = await getDownloadURL(coverLetterRef);
-  
-      // Save application data to Firestore in the 'jobApplications' collection
-      await addDoc(collection(db, 'jobApplications'), {
+
+      const applicationData = {
         ...formData,
-        jobTitle, // Save the passed job title
-        company, // Save the passed company name
+        jobTitle,
+        company,
         resumeURL,
         coverLetterURL,
         date: date.toISOString(),
-      });
-  
-      // Update the existing user document in Firestore with additional fields
+      };
+      await addDoc(collection(db, 'jobApplications'), applicationData);
+
       const user = auth.currentUser;
       if (user) {
         const userDocRef = doc(db, 'users', user.uid);
-        
-        // Update user document with additional details
         await updateDoc(userDocRef, {
           phone: formData.phone,
           address: formData.address,
@@ -192,69 +167,20 @@ const JobApplicationPage = () => {
           country: formData.country,
           zip: formData.zip,
         });
-        
-        console.log("User details updated successfully in Firestore.");
       }
-  
+
       navigate('/job-applied-successfully');
     } catch (err) {
       console.error('An error occurred while submitting your application:', err);
       setError('An error occurred while submitting your application.');
     }
-  };  
+  };
 
   return (
     <div style={{ fontSize: `${fontSize}px` }}>
-      {/* Navigation Bar */}
-      <NavBar position="static" highContrast={highContrast}>
-        <Toolbar>
-          <Typography variant="h6" sx={{ color: '#fff', marginRight: '2rem', textAlign: 'center' }}>
-            Inclusive Job Portal
-          </Typography>
-
-          {/* Navigation buttons */}
-          <NavButton highContrast={highContrast} isActive={location.pathname === '/home'} onClick={() => navigate('/home')}>
-            Home
-          </NavButton>
-          <NavButton highContrast={highContrast} isSearchJobs={location.pathname === '/job-application'} onClick={() => navigate('/search-jobs')}>
-            Search Jobs
-          </NavButton>
-          <NavButton highContrast={highContrast} isActive={location.pathname === '/manage-profile'} onClick={() => navigate('/manage-profile')}>
-            Manage Profile
-          </NavButton>
-          <NavButton highContrast={highContrast} isActive={location.pathname === '/skills-assessments'} onClick={() => navigate('/skills-assessments')}>
-            Skills Assessments
-          </NavButton>
-          <NavButton highContrast={highContrast} isActive={location.pathname === '/learning-resources'} onClick={() => navigate('/learning-resources')}>
-            Learning Resources
-          </NavButton>
-          <NavButton highContrast={highContrast} isActive={location.pathname === '/voice-command'} onClick={() => navigate('/voice-command')}>
-            Voice Command
-          </NavButton>
-          <NavButton highContrast={highContrast} isActive={location.pathname === '/accessibility-features'} onClick={() => navigate('/accessibility-features')}>
-            Accessibility Features
-          </NavButton>
-
-          {/* Icons Section */}
-          <Box sx={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', color: '#fff' }}>
-            <IconButton color="inherit" onClick={() => navigate('/new-jobs')}>
-              <NotificationsIcon />
-            </IconButton>
-            <IconButton color="inherit" onClick={() => navigate('/saved-jobs')}>
-              <BookmarkIcon />
-            </IconButton>
-            <IconButton color="inherit" onClick={() => navigate('/messages')}>
-              <MessageIcon />
-            </IconButton>
-            <IconButton color="inherit" onClick={() => navigate('/manage-profile')}>
-              <Avatar alt="User Profile" src="/profile-pic.jpg" />
-            </IconButton>
-          </Box>
-        </Toolbar>
-      </NavBar>
+      <UserNavBar activePage={'Search Jobs'}/>
 
       <PageContainer>
-        {/* Center Section: Job Application Form */}
         <CenterSection highContrast={highContrast}>
           <Typography variant="h4" gutterBottom>
             Apply for {jobTitle} at {company}
@@ -343,19 +269,18 @@ const JobApplicationPage = () => {
             />
             <Box marginTop="1rem">
               <Typography variant="subtitle1">Upload Resume</Typography>
-              <input type="file" onChange={handleResumeChange} required />
+              <input type="file" onChange={handleResumeChange} required aria-label="Upload Resume" />
             </Box>
             <Box marginTop="1rem">
               <Typography variant="subtitle1">Upload Cover Letter</Typography>
-              <input type="file" onChange={handleCoverLetterChange} required />
+              <input type="file" onChange={handleCoverLetterChange} required aria-label="Upload Cover Letter" />
             </Box>
-            {error && <Typography color="error" marginTop="1rem">{error}</Typography>}
-            <ApplyButton highContrast={highContrast} type="submit">Submit Application</ApplyButton>
+            {error && <Typography color="error" marginTop="1rem" aria-live="assertive">{error}</Typography>}
+            <ApplyButton highContrast={highContrast} data-command="Submit Application" type="submit">Submit Application</ApplyButton>
           </form>
         </CenterSection>
       </PageContainer>
 
-      {/* Accessibility Bar */}
       <AccessibilityBar>
         <Button variant="contained" onClick={toggleHighContrast} sx={{ marginRight: '1rem' }}>
           Toggle High Contrast

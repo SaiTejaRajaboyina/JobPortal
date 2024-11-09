@@ -1,31 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Button, Typography, Box, Avatar, IconButton, AppBar, Toolbar, TextField, Modal } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { Button, Typography, Box, Avatar, IconButton, TextField, Modal } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import BookmarkIcon from '@mui/icons-material/Bookmark';
-import MessageIcon from '@mui/icons-material/Message';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import { auth, db } from '../firebase';
-import { onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc, getDocs, collection, addDoc, deleteDoc, updateDoc } from 'firebase/firestore';
+import { db } from '../firebase';
+import { doc, collection, addDoc, deleteDoc, updateDoc, getDocs } from 'firebase/firestore';
+import EmployerNavBar from './EmployerNavBar';
 
-const NavBar = styled(AppBar)(({ highContrast }) => ({
-  backgroundColor: highContrast ? '#000' : '#007bff',
-  padding: '0rem',
-  color: highContrast ? '#fff' : '#fff',
-  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-}));
-
-const NavButton = styled(Button)(({ isActive, isPostJobs, highContrast }) => ({
-  color: highContrast ? (isPostJobs ? '#FFD700' : isActive ? '#FFD700' : '#fff') : isPostJobs ? '#FF9000' : isActive ? '#002DFF' : '#fff',
-  marginRight: '1rem',
-  '&:hover': {
-    backgroundColor: highContrast ? '#444' : 'rgba(255, 255, 255, 0.2)',
-  },
-}));
 
 const PageContainer = styled(Box)({
   display: 'flex',
@@ -114,11 +97,12 @@ const AccessibilityBar = styled(Box)({
 
 const PostJobsPage = () => {
   const navigate = useNavigate();
-  const currentLocation = useLocation();
-
   const [jobs, setJobs] = useState([]);
   const [selectedJob, setSelectedJob] = useState(null);
-  const [employerName, setEmployerName] = useState('');
+  const [employerInfo, setEmployerInfo] = useState({
+    companyName: '',
+    role: '',
+  });
   const [openModal, setOpenModal] = useState(false);
   const [newJob, setNewJob] = useState({
     title: '',
@@ -136,17 +120,20 @@ const PostJobsPage = () => {
     setHighContrast(savedHighContrast);
     setFontSize(savedFontSize);
 
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const userDoc = await getDoc(doc(db, 'employers', user.uid));
-        if (userDoc.exists()) {
-          const { firstName, lastName } = userDoc.data();
-          setEmployerName(`${firstName} ${lastName}`);
-        }
-      }
+    // Fetch employer info from local storage
+    const savedCompanyName = localStorage.getItem('topSectionData')
+      ? JSON.parse(localStorage.getItem('topSectionData')).companyName
+      : '';
+    const savedRole = localStorage.getItem('topSectionData')
+      ? JSON.parse(localStorage.getItem('topSectionData')).role
+      : '';
+
+    setEmployerInfo({
+      companyName: savedCompanyName,
+      role: savedRole,
     });
 
-    // Fetch the existing jobs from Firestore
+    // Fetch jobs from Firestore
     const fetchJobs = async () => {
       const jobsSnapshot = await getDocs(collection(db, 'jobs'));
       const jobsData = jobsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
@@ -154,7 +141,6 @@ const PostJobsPage = () => {
     };
 
     fetchJobs();
-    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
@@ -210,98 +196,44 @@ const PostJobsPage = () => {
 
   return (
     <div style={{ fontSize: `${fontSize}px` }}>
-      {/* Navigation Bar */}
-      <NavBar highContrast={highContrast} position="static">
-        <Toolbar>
-          <Typography variant="h6" sx={{ color: '#fff', marginRight: '2rem', textAlign: 'center' }}>
-            Inclusive Job Portal
-          </Typography>
-          <NavButton highContrast={highContrast} isActive={currentLocation.pathname === '/employer-home'} onClick={() => navigate('/employer-home')}>
-            Home
-          </NavButton>
-          <NavButton highContrast={highContrast} isPostJobs={currentLocation.pathname === '/posting-jobs'} onClick={() => navigate('/post-jobs')}>
-            Post Jobs
-          </NavButton>
-          <NavButton highContrast={highContrast} isActive={currentLocation.pathname === '/manage-profile'} onClick={() => navigate('/manage-profile')}>
-            Manage Profile
-          </NavButton>
-          <NavButton highContrast={highContrast} isActive={currentLocation.pathname === '/manage-applications'} onClick={() => navigate('/manage-applications')}>
-            Manage Applications
-          </NavButton>
-          <NavButton highContrast={highContrast} isActive={currentLocation.pathname === '/shortlisted-candidates'} onClick={() => navigate('/shortlisted-candidates')}>
-            Shortlisted Candidates
-          </NavButton>
-          <NavButton highContrast={highContrast} isActive={currentLocation.pathname === '/skill-assessment'} onClick={() => navigate('/skill-assessment')}>
-            Skill Assessment
-          </NavButton>
-          <NavButton highContrast={highContrast} isActive={currentLocation.pathname === '/learning-resources'} onClick={() => navigate('/learning-resources')}>
-            Learning Resources
-          </NavButton>
-          <NavButton highContrast={highContrast} isActive={currentLocation.pathname === '/accessibility-features'} onClick={() => navigate('/accessibility-features')}>
-            Accessibility Features
-          </NavButton>
+      <EmployerNavBar activePage="Post Jobs" />
 
-          {/* Icons Section */}
-          <Box sx={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', color: '#fff' }}>
-            <IconButton color="inherit" onClick={() => navigate('/notifications')}>
-              <NotificationsIcon />
-            </IconButton>
-            <IconButton color="inherit" onClick={() => navigate('/saved-jobs')}>
-              <BookmarkIcon />
-            </IconButton>
-            <IconButton color="inherit" onClick={() => navigate('/messages')}>
-              <MessageIcon />
-            </IconButton>
-            <IconButton color="inherit" onClick={() => navigate('/manage-profile')}>
-              <Avatar alt="User Profile" src="/profile-pic.jpg" />
-            </IconButton>
-          </Box>
-        </Toolbar>
-      </NavBar>
-
-      {/* Rest of the Page */}
       <PageContainer>
-        {/* Left Side: Job Listings */}
         <LeftSide>
           <JobTitleBar>
             <Typography variant="h6">Jobs</Typography>
-            <IconButton onClick={() => setOpenModal(true)}>
+            <IconButton onClick={() => setOpenModal(true)} aria-label="Add a new job">
               <AddIcon />
             </IconButton>
           </JobTitleBar>
 
           {jobs.map((job) => (
-            <JobItem key={job.id} onClick={() => handleJobSelect(job)}>
-              <JobLogo src="https://via.placeholder.com/50" alt={job.company} />
+            <JobItem key={job.id} onClick={() => handleJobSelect(job)} aria-label={`Select job ${job.title}`}>
+              <JobLogo src="https://via.placeholder.com/50" alt={`${job.company} logo`} />
               <Box>
                 <Typography variant="h6">{job.title}</Typography>
                 <Typography variant="body2">{job.company}</Typography>
                 <Typography variant="body2">{job.location}</Typography>
               </Box>
-              <IconButton onClick={() => handleDeleteJob(job)}>
+              <IconButton onClick={() => handleDeleteJob(job)} aria-label={`Delete job ${job.title}`}>
                 <DeleteIcon />
               </IconButton>
-              <IconButton onClick={() => handleJobSelect(job)}>
+              <IconButton onClick={() => handleJobSelect(job)} aria-label={`Edit job ${job.title}`}>
                 <EditIcon />
               </IconButton>
             </JobItem>
           ))}
         </LeftSide>
 
-        {/* Center Section: Job Description */}
         <CenterSection>
           {selectedJob ? (
             <>
               <Typography variant="h5">{selectedJob.title}</Typography>
               <Typography variant="subtitle1">{selectedJob.company}</Typography>
               <Typography variant="subtitle2">{selectedJob.location}</Typography>
-              <Typography variant="h6" marginTop="1rem">
-                Description
-              </Typography>
-              <Typography variant="body1" marginTop="0.5rem">
-                {selectedJob.description}
-              </Typography>
-              <Button variant="contained" color="primary" sx={{ marginTop: '1rem' }} onClick={() => handleUpdateJob(selectedJob)}>
+              <Typography variant="h6" marginTop="1rem">Description</Typography>
+              <Typography variant="body1" marginTop="0.5rem">{selectedJob.description}</Typography>
+              <Button variant="contained" color="primary" sx={{ marginTop: '1rem' }} onClick={() => handleUpdateJob(selectedJob)} aria-label="Update job">
                 Update Job
               </Button>
             </>
@@ -310,31 +242,28 @@ const PostJobsPage = () => {
           )}
         </CenterSection>
 
-        {/* Right Side: Employer Profile */}
         <RightSide>
           <UserProfile>
             <Avatar alt="Employer" src="https://via.placeholder.com/150" sx={{ width: 100, height: 100 }} />
-            <Typography variant="h6" sx={{ textAlign: 'center' }}>{employerName}</Typography>
-            <Typography variant="body2" sx={{ textAlign: 'center' }}>Employer</Typography>
-            <Button variant="contained" color="primary" sx={{ marginTop: '1rem' }} onClick={() => navigate('/manage-profile')}>
+            <Typography variant="h6" sx={{ textAlign: 'center' }}>{employerInfo.companyName}</Typography>
+            <Typography variant="body2" sx={{ textAlign: 'center' }}>{employerInfo.role}</Typography>
+            <Button variant="contained" color="primary" sx={{ marginTop: '1rem' }} data-command="Edit Profile" onClick={() => navigate('/employer-manage-profile')} aria-label="Edit profile">
               Edit Profile
             </Button>
           </UserProfile>
         </RightSide>
       </PageContainer>
 
-      {/* Modal for Adding New Job */}
-      <JobFormModal open={openModal} onClose={() => setOpenModal(false)}>
+      <JobFormModal open={openModal} onClose={() => setOpenModal(false)} aria-labelledby="add-job-modal">
         <Box sx={{ padding: '2rem', backgroundColor: '#fff', borderRadius: '8px', width: '400px' }}>
-          <Typography variant="h6" gutterBottom>
-            Add New Job
-          </Typography>
+          <Typography variant="h6" gutterBottom id="add-job-modal">Add New Job</Typography>
           <TextField
             label="Job Title"
             value={newJob.title}
             onChange={(e) => setNewJob({ ...newJob, title: e.target.value })}
             fullWidth
             margin="normal"
+            aria-label="Job Title"
           />
           <TextField
             label="Company"
@@ -342,6 +271,7 @@ const PostJobsPage = () => {
             onChange={(e) => setNewJob({ ...newJob, company: e.target.value })}
             fullWidth
             margin="normal"
+            aria-label="Company Name"
           />
           <TextField
             label="Location"
@@ -349,6 +279,7 @@ const PostJobsPage = () => {
             onChange={(e) => setNewJob({ ...newJob, location: e.target.value })}
             fullWidth
             margin="normal"
+            aria-label="Job Location"
           />
           <TextField
             label="Description"
@@ -356,22 +287,22 @@ const PostJobsPage = () => {
             onChange={(e) => setNewJob({ ...newJob, description: e.target.value })}
             fullWidth
             margin="normal"
+            aria-label="Job Description"
           />
-          <Button variant="contained" color="primary" fullWidth sx={{ marginTop: '1rem' }} onClick={handleAddJob}>
+          <Button variant="contained" color="primary" fullWidth sx={{ marginTop: '1rem' }} onClick={handleAddJob} aria-label="Submit new job">
             Add Job
           </Button>
         </Box>
       </JobFormModal>
 
-      {/* Accessibility Bar */}
       <AccessibilityBar>
-        <Button variant="contained" onClick={toggleHighContrast} sx={{ marginRight: '1rem' }}>
+        <Button variant="contained" onClick={toggleHighContrast} sx={{ marginRight: '1rem' }} aria-label="Toggle high contrast mode">
           Toggle High Contrast
         </Button>
-        <Button variant="contained" onClick={increaseFontSize} sx={{ marginRight: '1rem' }}>
+        <Button variant="contained" onClick={increaseFontSize} sx={{ marginRight: '1rem' }} aria-label="Increase font size">
           Increase Font Size
         </Button>
-        <Button variant="contained" onClick={decreaseFontSize}>
+        <Button variant="contained" onClick={decreaseFontSize} aria-label="Decrease font size">
           Decrease Font Size
         </Button>
       </AccessibilityBar>

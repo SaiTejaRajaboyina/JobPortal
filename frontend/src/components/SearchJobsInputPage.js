@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Button, Typography, Box, Autocomplete, TextField } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import { db } from '../firebase'; // Import Firestore database
+import { collection, getDocs } from 'firebase/firestore';
 
 const Root = styled('div')(({ highContrast }) => ({
   display: 'flex',
@@ -49,26 +51,40 @@ const AccessibilityBar = styled(Box)({
   zIndex: 1000,
 });
 
-// Predefined list of job titles
-const jobTitles = [
-  'Software Engineer', 'Data Scientist', 'Product Manager', 'Marketing Manager', 'UI/UX Designer',
-  'DevOps Engineer', 'Accountant', 'Sales Manager', 'Human Resources Manager', 'Customer Support',
-  'Project Manager', 'Web Developer', 'Data Analyst', 'Business Analyst', 'Graphic Designer'
-];
-
-// Predefined list of locations
-const locations = [
-  'New York, NY', 'Los Angeles, CA', 'San Francisco, CA', 'Austin, TX', 'Chicago, IL',
-  'Boston, MA', 'Seattle, WA', 'Denver, CO', 'Atlanta, GA', 'Miami, FL'
-];
-
 const SearchJobsInputPage = () => {
+  const [jobTitles, setJobTitles] = useState([]);
+  const [locations, setLocations] = useState([]);
   const [jobTitle, setJobTitle] = useState('');
   const [location, setLocation] = useState('');
   const [highContrast, setHighContrast] = useState(false);
   const [fontSize, setFontSize] = useState(16);
   const navigate = useNavigate();
 
+  // Fetch job titles and locations from Firestore
+  useEffect(() => {
+    const fetchJobData = async () => {
+      try {
+        const jobsSnapshot = await getDocs(collection(db, 'jobs'));
+        const titlesSet = new Set();
+        const locationsSet = new Set();
+        
+        jobsSnapshot.forEach((doc) => {
+          const data = doc.data();
+          titlesSet.add(data.title);
+          locationsSet.add(data.location);
+        });
+
+        setJobTitles(Array.from(titlesSet));
+        setLocations(Array.from(locationsSet));
+      } catch (error) {
+        console.error("Error fetching job data:", error);
+      }
+    };
+
+    fetchJobData();
+  }, []);
+
+  // Load settings for high contrast and font size from localStorage
   useEffect(() => {
     const savedHighContrast = localStorage.getItem('highContrast') === 'true';
     const savedFontSize = parseInt(localStorage.getItem('fontSize'), 10) || 16;
@@ -76,32 +92,30 @@ const SearchJobsInputPage = () => {
     setFontSize(savedFontSize);
   }, []);
 
+  // Save settings for high contrast and font size to localStorage
   useEffect(() => {
     localStorage.setItem('highContrast', highContrast);
     localStorage.setItem('fontSize', fontSize);
   }, [highContrast, fontSize]);
 
-  const toggleHighContrast = () => {
-    setHighContrast(!highContrast);
-  };
-
-  const increaseFontSize = () => {
-    setFontSize((prevSize) => Math.min(prevSize + 2, 24));
-  };
-
-  const decreaseFontSize = () => {
-    setFontSize((prevSize) => Math.max(prevSize - 2, 12));
-  };
+  const toggleHighContrast = () => setHighContrast(!highContrast);
+  const increaseFontSize = () => setFontSize((prevSize) => Math.min(prevSize + 2, 24));
+  const decreaseFontSize = () => setFontSize((prevSize) => Math.max(prevSize - 2, 12));
 
   const handleSearch = () => {
     navigate('/search-jobs', { state: { jobTitle, location } });
   };
 
   return (
-    <div style={{ fontSize: `${fontSize}px`, backgroundColor: highContrast ? '#333' : '#f0f4f8', color: highContrast ? '#fff' : '#000' }}>
+    <div
+      style={{ fontSize: `${fontSize}px`, backgroundColor: highContrast ? '#333' : '#f0f4f8', color: highContrast ? '#fff' : '#000' }}
+      aria-label="Search Jobs Input Page"
+    >
       <Root highContrast={highContrast}>
-        <FormContainer highContrast={highContrast}>
-          <Title variant="h4" highContrast={highContrast}>Search Jobs</Title>
+        <FormContainer highContrast={highContrast} aria-label="Job Search Form">
+          <Title variant="h4" highContrast={highContrast} aria-label="Search Jobs Title">
+            Search Jobs
+          </Title>
 
           {/* Job Title or Keywords Dropdown */}
           <Autocomplete
@@ -111,6 +125,7 @@ const SearchJobsInputPage = () => {
                 {...params}
                 label="Job Title or Keywords"
                 variant="outlined"
+                aria-label="Select Job Title or Keywords"
                 InputLabelProps={{ style: { color: highContrast ? '#fff' : '#000' } }}
                 InputProps={{ ...params.InputProps, style: { color: highContrast ? '#fff' : '#000' } }}
               />
@@ -129,6 +144,7 @@ const SearchJobsInputPage = () => {
                 {...params}
                 label="Location"
                 variant="outlined"
+                aria-label="Select Location"
                 InputLabelProps={{ style: { color: highContrast ? '#fff' : '#000' } }}
                 InputProps={{ ...params.InputProps, style: { color: highContrast ? '#fff' : '#000' } }}
               />
@@ -139,19 +155,38 @@ const SearchJobsInputPage = () => {
 
           <Box mt={2} />
 
-          <SearchButton highContrast={highContrast} onClick={handleSearch}>Search</SearchButton>
+          <SearchButton highContrast={highContrast} data-command="Search" aria-label="Search Jobs" onClick={handleSearch}>
+            Search
+          </SearchButton>
         </FormContainer>
       </Root>
 
       {/* Accessibility Bar */}
-      <AccessibilityBar>
-        <Button variant="contained" onClick={toggleHighContrast} sx={{ marginRight: '1rem' }}>
+      <AccessibilityBar aria-label="Accessibility Options">
+        <Button
+          variant="contained"
+          aria-label="Toggle High Contrast Mode"
+          data-command="Toggle"
+          onClick={toggleHighContrast}
+          sx={{ marginRight: '1rem' }}
+        >
           Toggle High Contrast
         </Button>
-        <Button variant="contained" onClick={increaseFontSize} sx={{ marginRight: '1rem' }}>
+        <Button
+          variant="contained"
+          aria-label="Increase Font Size"
+          data-command="Increase Font Size"
+          onClick={increaseFontSize}
+          sx={{ marginRight: '1rem' }}
+        >
           Increase Font Size
         </Button>
-        <Button variant="contained" onClick={decreaseFontSize}>
+        <Button
+          variant="contained"
+          aria-label="Decrease Font Size"
+          data-command="Decrease Font Size"
+          onClick={decreaseFontSize}
+        >
           Decrease Font Size
         </Button>
       </AccessibilityBar>

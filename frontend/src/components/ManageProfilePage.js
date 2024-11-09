@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
-  Toolbar,
   Typography,
   Button,
   Box,
@@ -14,30 +13,11 @@ import {
   Chip,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import {
-  Edit as EditIcon,
-  Notifications as NotificationsIcon,
-  Bookmark as BookmarkIcon,
-  Message as MessageIcon,
-} from '@mui/icons-material';
+import { Edit as EditIcon } from '@mui/icons-material';
 import { db, auth } from '../firebase'; // Firebase Firestore and Auth
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
-
-const NavBar = styled('div')(({ highContrast }) => ({
-  backgroundColor: highContrast ? '#000' : '#007bff',
-  padding: '0rem',
-  color: highContrast ? '#fff' : '#fff',
-  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-}));
-
-const NavButton = styled(Button)(({ isActive, isManageProfile, highContrast }) => ({
-  color: highContrast ? (isManageProfile ? '#FFD700' : isActive ? '#FFD700' : '#fff') : isManageProfile ? '#FF9000' : isActive ? '#002DFF' : '#fff',
-  marginRight: '1rem',
-  '&:hover': {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-  },
-}));
+import UserNavBar from './UserNavBar';
 
 const PageContainer = styled(Box)({
   padding: '2rem',
@@ -78,13 +58,12 @@ const AccessibilityBar = styled(Box)({
 
 const ManageProfilePage = () => {
   const navigate = useNavigate();
-  const location = useLocation();
 
   const [userData, setUserData] = useState({
     photoURL: 'https://via.placeholder.com/150',
     firstName: '',
     lastName: '',
-    role: '', // Initially empty, not from localStorage
+    role: '',
     available: true,
     email: '',
     phone: '',
@@ -92,8 +71,8 @@ const ManageProfilePage = () => {
     state: '',
     country: '',
     zip: '',
-    skills: [], // Initially empty, not from localStorage
-    hasSubmittedApplication: false, // Track if the user submitted an application
+    skills: [],
+    hasSubmittedApplication: false,
   });
 
   const [isEditingTopSection, setIsEditingTopSection] = useState(false);
@@ -119,8 +98,8 @@ const ManageProfilePage = () => {
               firstName: data.firstName || '',
               lastName: data.lastName || '',
               email: user.email || '',
-              skills: JSON.parse(localStorage.getItem('userSkills')) || [], // Get skills from localStorage or empty
-              role: localStorage.getItem('userRole') || '', // Get role from localStorage or empty
+              skills: JSON.parse(localStorage.getItem('userSkills')) || [],
+              role: localStorage.getItem('userRole') || '',
               hasSubmittedApplication: data.hasSubmittedApplication || false,
             });
           }
@@ -180,7 +159,6 @@ const ManageProfilePage = () => {
       return;
     }
 
-    // Save role and skills to localStorage as they aren't saved in Firestore
     localStorage.setItem('userRole', topSectionData.role);
     localStorage.setItem('userSkills', JSON.stringify(userData.skills));
 
@@ -206,7 +184,6 @@ const ManageProfilePage = () => {
 
   const handleSaveMiddleSection = async () => {
     if (userData.hasSubmittedApplication) {
-      // Save fields to Firestore only if user has submitted at least one application
       try {
         await updateDoc(doc(db, 'users', auth.currentUser.uid), {
           phone: middleSectionData.phone,
@@ -232,7 +209,7 @@ const ManageProfilePage = () => {
     if (newSkill && !userData.skills.includes(newSkill)) {
       const updatedSkills = [...userData.skills, newSkill];
       setUserData((prevData) => ({ ...prevData, skills: updatedSkills }));
-      localStorage.setItem('userSkills', JSON.stringify(updatedSkills)); // Save to localStorage
+      localStorage.setItem('userSkills', JSON.stringify(updatedSkills));
       setNewSkill('');
     }
   };
@@ -240,7 +217,7 @@ const ManageProfilePage = () => {
   const handleDeleteSkill = (skillToDelete) => {
     const updatedSkills = userData.skills.filter((skill) => skill !== skillToDelete);
     setUserData((prevData) => ({ ...prevData, skills: updatedSkills }));
-    localStorage.setItem('userSkills', JSON.stringify(updatedSkills)); // Save to localStorage
+    localStorage.setItem('userSkills', JSON.stringify(updatedSkills));
   };
 
   const handlePopupClose = () => {
@@ -257,54 +234,13 @@ const ManageProfilePage = () => {
 
   return (
     <div style={{ fontSize: `${fontSize}px` }}>
-      {/* Navigation Bar */}
-      <NavBar highContrast={highContrast}>
-        <Toolbar>
-          <Typography variant="h6" sx={{ color: '#fff', marginRight: '2rem', textAlign: 'center' }}>
-            Inclusive Job Portal
-          </Typography>
-          <NavButton highContrast={highContrast} isActive={location.pathname === '/home'} onClick={() => navigate('/home')}>
-            Home
-          </NavButton>
-          <NavButton highContrast={highContrast} isActive={location.pathname === '/search-jobs'} onClick={() => navigate('/search-jobs')}>
-            Search Jobs
-          </NavButton>
-          <NavButton highContrast={highContrast} isManageProfile={location.pathname === '/manage-profile'} onClick={() => navigate('/manage-profile')}>
-            Manage Profile
-          </NavButton>
-          <NavButton highContrast={highContrast} isActive={location.pathname === '/skills-assessments'} onClick={() => navigate('/skills-assessments')}>
-            Skills Assessments
-          </NavButton>
-          <NavButton highContrast={highContrast} isActive={location.pathname === '/learning-resources'} onClick={() => navigate('/learning-resources')}>
-            Learning Resources
-          </NavButton>
-          <NavButton highContrast={highContrast} isActive={location.pathname === '/voice-command'} onClick={() => navigate('/voice-command')}>
-            Voice Command
-          </NavButton>
-          <NavButton highContrast={highContrast} isActive={location.pathname === '/accessibility-features'} onClick={() => navigate('/accessibility-features')}>
-            Accessibility Features
-          </NavButton>
-
-          <IconButton color="inherit" onClick={() => navigate('/notifications')}>
-            <NotificationsIcon />
-          </IconButton>
-          <IconButton color="inherit" onClick={() => navigate('/saved-jobs')}>
-            <BookmarkIcon />
-          </IconButton>
-          <IconButton color="inherit" onClick={() => navigate('/messages')}>
-            <MessageIcon />
-          </IconButton>
-          <IconButton color="inherit" onClick={() => navigate('/manage-profile')}>
-            <Avatar alt="User Profile" src={userData.photoURL} />
-          </IconButton>
-        </Toolbar>
-      </NavBar>
+      <UserNavBar activePage={'Manage Profile'} />
 
       <PageContainer>
         {/* Top Section */}
         <ProfileSection highContrast={highContrast} sx={{ position: 'relative', textAlign: 'center' }}>
           <Avatar src={userData.photoURL} sx={{ width: 100, height: 100, margin: 'auto' }} />
-          <Typography variant="h6" sx={{ marginTop: '1rem' }}>
+          <Typography variant="h6" sx={{ marginTop: '1rem' }} tabIndex="0">
             {`${userData.firstName} ${userData.lastName}`}
           </Typography>
           {isEditingTopSection ? (
@@ -347,7 +283,7 @@ const ManageProfilePage = () => {
                 <option value="Available">Available</option>
                 <option value="Not Available">Not Available</option>
               </TextField>
-              <SaveButton variant="contained" onClick={handleSaveTopSection}>
+              <SaveButton variant="contained" data-command="Top Save" onClick={handleSaveTopSection}>
                 Save
               </SaveButton>
             </>
@@ -355,7 +291,7 @@ const ManageProfilePage = () => {
             <>
               <Typography variant="h6">{userData.role || ''}</Typography>
               <Typography variant="body2">{userData.available ? 'Available to Work' : 'Not Available'}</Typography>
-              <EditButton onClick={handleEditTopSection}>
+              <EditButton data-command="Top Edit" onClick={handleEditTopSection}>
                 <EditIcon />
               </EditButton>
             </>
@@ -366,11 +302,41 @@ const ManageProfilePage = () => {
         <ProfileSection highContrast={highContrast} sx={{ position: 'relative' }}>
           {isEditingMiddleSection ? (
             <>
-              <TextField label="Phone Number" value={middleSectionData.phone} onChange={(e) => setMiddleSectionData({ ...middleSectionData, phone: e.target.value })} fullWidth margin="normal" />
-              <TextField label="Address" value={middleSectionData.address} onChange={(e) => setMiddleSectionData({ ...middleSectionData, address: e.target.value })} fullWidth margin="normal" />
-              <TextField label="State" value={middleSectionData.state} onChange={(e) => setMiddleSectionData({ ...middleSectionData, state: e.target.value })} fullWidth margin="normal" />
-              <TextField label="Country" value={middleSectionData.country} onChange={(e) => setMiddleSectionData({ ...middleSectionData, country: e.target.value })} fullWidth margin="normal" />
-              <TextField label="Zip Code" value={middleSectionData.zip} onChange={(e) => setMiddleSectionData({ ...middleSectionData, zip: e.target.value })} fullWidth margin="normal" />
+              <TextField
+                label="Phone Number"
+                value={middleSectionData.phone}
+                onChange={(e) => setMiddleSectionData({ ...middleSectionData, phone: e.target.value })}
+                fullWidth
+                margin="normal"
+              />
+              <TextField
+                label="Address"
+                value={middleSectionData.address}
+                onChange={(e) => setMiddleSectionData({ ...middleSectionData, address: e.target.value })}
+                fullWidth
+                margin="normal"
+              />
+              <TextField
+                label="State"
+                value={middleSectionData.state}
+                onChange={(e) => setMiddleSectionData({ ...middleSectionData, state: e.target.value })}
+                fullWidth
+                margin="normal"
+              />
+              <TextField
+                label="Country"
+                value={middleSectionData.country}
+                onChange={(e) => setMiddleSectionData({ ...middleSectionData, country: e.target.value })}
+                fullWidth
+                margin="normal"
+              />
+              <TextField
+                label="Zip Code"
+                value={middleSectionData.zip}
+                onChange={(e) => setMiddleSectionData({ ...middleSectionData, zip: e.target.value })}
+                fullWidth
+                margin="normal"
+              />
               <Box sx={{ marginTop: '1rem' }}>
                 <Typography variant="h6">Skills and Expertise</Typography>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.5rem' }}>
@@ -380,12 +346,12 @@ const ManageProfilePage = () => {
                 </Box>
                 <Box sx={{ display: 'flex', marginTop: '0.5rem' }}>
                   <TextField label="Add Skill" value={newSkill} onChange={(e) => setNewSkill(e.target.value)} fullWidth />
-                  <Button variant="contained" onClick={handleAddSkill} sx={{ marginLeft: '1rem' }}>
+                  <Button variant="contained" data-command="Add" onClick={handleAddSkill} sx={{ marginLeft: '1rem' }}>
                     Add
                   </Button>
                 </Box>
               </Box>
-              <SaveButton variant="contained" onClick={handleSaveMiddleSection}>
+              <SaveButton variant="contained" data-command="Bottom Save" onClick={handleSaveMiddleSection}>
                 Save
               </SaveButton>
             </>
@@ -414,7 +380,7 @@ const ManageProfilePage = () => {
                   ))}
                 </Box>
               </Box>
-              <EditButton onClick={handleEditMiddleSection}>
+              <EditButton data-command="Bottom Edit" onClick={handleEditMiddleSection}>
                 <EditIcon />
               </EditButton>
             </>
@@ -431,13 +397,13 @@ const ManageProfilePage = () => {
 
       {/* Accessibility Bar */}
       <AccessibilityBar>
-        <Button variant="contained" onClick={toggleHighContrast} sx={{ marginRight: '1rem' }}>
+        <Button variant="contained" data-command="Toggle" onClick={toggleHighContrast} sx={{ marginRight: '1rem' }}>
           Toggle High Contrast
         </Button>
-        <Button variant="contained" onClick={increaseFontSize} sx={{ marginRight: '1rem' }}>
+        <Button variant="contained" data-command="Increase Font Size" onClick={increaseFontSize} sx={{ marginRight: '1rem' }}>
           Increase Font Size
         </Button>
-        <Button variant="contained" onClick={decreaseFontSize}>
+        <Button variant="contained" data-command="Decrease Font Size" onClick={decreaseFontSize}>
           Decrease Font Size
         </Button>
       </AccessibilityBar>

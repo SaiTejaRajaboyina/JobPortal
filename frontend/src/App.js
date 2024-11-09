@@ -16,6 +16,17 @@ import ManageProfilePage from './components/ManageProfilePage';
 import EmployerHomePage from './components/EmployerHomePage';
 import PostJobsPage from './components/PostJobsPage';
 import { AccessibilityProvider } from './components/AccessibilityProvider'; // Import AccessibilityProvider
+import SkillAssessmentDashboard from './components/SkillAssessmentDashboard';
+import SkillAssessment from './components/SkillAssessment';
+import SkillAssessmentResults from './components/SkillAssessmentResults';
+import LearningResources from './components/LearningResources';
+import EmployerLearningResourceDashboard from './components/EmployerLearningResourceDashboard';
+import AddResource from './components/AddResource';
+import EmployerSkillAssessmentDashboard from './components/EmployerSkillAssessmentDashboard';
+import ManageQuestions from './components/ManageQuestions';
+import EmployerManageProfilePage from './components/EmployerManageProfilePage';
+import ManageApplicationsPage from './components/ManageApplicationsPage';
+import ShortlistedCandidates from './components/ShortlistedCandidates';
 
 function App() {
   return (
@@ -54,6 +65,40 @@ function App() {
 
           {/* Route for the Post Jobs */}
           <Route path="/posting-jobs" element={<PostJobsPage />} />
+
+          {/* Route for the Skill Assessment Dashboard */}
+          <Route path="/skills-assessments" element={<SkillAssessmentDashboard />}/>
+
+          {/* Route for the Skill Assessment */}
+          <Route path="/skills-assessments-list" element={<SkillAssessment />}/>
+
+          {/* Route for the Skill Assessment */}
+          <Route path="/skills-assessments-result" element={<SkillAssessmentResults  />}/>
+
+          {/* Route for the Learning Resources */}
+          <Route path="/learning-resources" element={<LearningResources />}/> 
+
+          {/* Route for the Employer Learning Resources Dashboard */}
+          <Route path="/employer-learning-resources" element={<EmployerLearningResourceDashboard />}/>
+
+          {/* Route for the AddResources */}
+          <Route path="/add-resources" element={<AddResource />}/>    
+
+          {/* Route for the Employer Skill Assessment Dashboard */}
+          <Route path="/employer-skill-assessment" element={<EmployerSkillAssessmentDashboard />}/> 
+
+          {/* Route for the Manage Questions */}
+          <Route path="/manage-questions" element={<ManageQuestions />} />
+
+          {/* Route for the Employer Manage Profile */}
+          <Route path="/employer-manage-profile" element={<EmployerManageProfilePage />} /> 
+
+          {/* Route for the Employer Manage Application */}
+          <Route path="/manage-applications" element={<ManageApplicationsPage />} />
+
+          {/* Route for the Shortlisted Candidates */}
+          <Route path="/shortlisted-candidates" element={<ShortlistedCandidates />} />    
+
         </Routes>
       </Router>
     </AccessibilityProvider>

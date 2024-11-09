@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Button, Typography, Box, Avatar, IconButton, Toolbar } from '@mui/material';
+import { Button, Typography, Box, Avatar } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import BookmarkIcon from '@mui/icons-material/Bookmark';
-import MessageIcon from '@mui/icons-material/Message';
 import { auth, db } from '../firebase'; // Import auth and db
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore'; // Firestore functions
+import UserNavBar from './UserNavBar';
 
-// Add the generateJobs function to generate mock job listings
 const generateJobs = (jobTitle, location) => {
   const mockCompanies = [
     { name: 'Tech Corp', logo: 'https://via.placeholder.com/50?text=Tech+Corp' },
@@ -19,7 +16,7 @@ const generateJobs = (jobTitle, location) => {
     { name: 'Cloud Solutions', logo: 'https://via.placeholder.com/50?text=Cloud+Solutions' },
     { name: 'NextGen Systems', logo: 'https://via.placeholder.com/50?text=NextGen+Systems' },
   ];
-  const jobCount = 10; // Number of jobs to generate
+  const jobCount = 10;
   const jobs = [];
 
   for (let i = 1; i <= jobCount; i++) {
@@ -36,28 +33,6 @@ const generateJobs = (jobTitle, location) => {
 
   return jobs;
 };
-
-const NavBar = styled('div')(({ highContrast }) => ({
-  backgroundColor: highContrast ? '#000' : '#007bff',
-  padding: '0rem',
-  color: highContrast ? '#fff' : '#fff',
-  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-}));
-
-const NavButton = styled(Button)(({ isActive, isSearchJobs, highContrast }) => ({
-  color: highContrast ? (isSearchJobs ? '#FFD700' : isActive ? '#FFD700' : '#fff') : isSearchJobs ? '#FF9000' : isActive ? '#002DFF' : '#fff',
-  marginRight: '1rem',
-  '&:hover': {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-  },
-}));
-
-const IconSection = styled(Box)({
-  marginLeft: 'auto',
-  display: 'flex',
-  alignItems: 'center',
-  color: '#fff',
-});
 
 const PageContainer = styled(Box)({
   display: 'flex',
@@ -185,14 +160,13 @@ const SearchJobsPage = () => {
   const [highContrast, setHighContrast] = useState(false);
   const [fontSize, setFontSize] = useState(16);
 
-  const [userRole] = useState(localStorage.getItem('userRole') || 'Job Seeker'); // Default role
-  const [userSkills] = useState(JSON.parse(localStorage.getItem('userSkills')) || ['JavaScript', 'React', 'Node.js']); // Default skills
+  const [userRole] = useState(localStorage.getItem('userRole') || 'Job Seeker');
+  const [userSkills] = useState(JSON.parse(localStorage.getItem('userSkills')) || ['JavaScript', 'React', 'Node.js']);
 
   useEffect(() => {
     const generatedJobs = generateJobs(jobTitle || 'Software Engineer', loc || 'New York, NY');
     setJobs(generatedJobs);
 
-    // Listen to auth state changes and fetch user data from Firestore
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         const userDoc = await getDoc(doc(db, 'users', user.uid));
@@ -216,87 +190,27 @@ const SearchJobsPage = () => {
     localStorage.setItem('fontSize', fontSize);
   }, [highContrast, fontSize]);
 
-  const toggleHighContrast = () => {
-    setHighContrast(!highContrast);
-  };
+  const toggleHighContrast = () => setHighContrast(!highContrast);
+  const increaseFontSize = () => setFontSize((prevSize) => Math.min(prevSize + 2, 24));
+  const decreaseFontSize = () => setFontSize((prevSize) => Math.max(prevSize - 2, 12));
 
-  const increaseFontSize = () => {
-    setFontSize((prevSize) => Math.min(prevSize + 2, 24));
-  };
-
-  const decreaseFontSize = () => {
-    setFontSize((prevSize) => Math.max(prevSize - 2, 12));
-  };
-
-  const handleJobSelect = (job) => {
-    setSelectedJob(job);
-  };
+  const handleJobSelect = (job) => setSelectedJob(job);
 
   return (
     <div style={{ fontSize: `${fontSize}px` }}>
-      {/* Navigation Bar */}
-      <NavBar position="static" highContrast={highContrast}>
-        <Toolbar>
-          <Typography variant="h6" sx={{ color: '#fff', marginRight: '2rem', textAlign: 'center' }}>
-            Inclusive Job Portal
-          </Typography>
+      <UserNavBar activePage="Search Jobs" />
 
-          {/* Navigation buttons */}
-          <NavButton highContrast={highContrast} isActive={location.pathname === '/home'} onClick={() => navigate('/home')}>
-            Home
-          </NavButton>
-          <NavButton highContrast={highContrast} isSearchJobs={location.pathname === '/search-jobs'} onClick={() => navigate('/search-jobs')}>
-            Search Jobs
-          </NavButton>
-          <NavButton highContrast={highContrast} isActive={location.pathname === '/manage-profile'} onClick={() => navigate('/manage-profile')}>
-            Manage Profile
-          </NavButton>
-          <NavButton highContrast={highContrast} isActive={location.pathname === '/skills-assessments'} onClick={() => navigate('/skills-assessments')}>
-            Skills Assessments
-          </NavButton>
-          <NavButton highContrast={highContrast} isActive={location.pathname === '/learning-resources'} onClick={() => navigate('/learning-resources')}>
-            Learning Resources
-          </NavButton>
-          <NavButton highContrast={highContrast} isActive={location.pathname === '/voice-command'} onClick={() => navigate('/voice-command')}>
-            Voice Command
-          </NavButton>
-          <NavButton highContrast={highContrast} isActive={location.pathname === '/accessibility-features'} onClick={() => navigate('/accessibility-features')}>
-            Accessibility Features
-          </NavButton>
-
-          {/* Icons Section */}
-          <IconSection>
-            <IconButton color="inherit" onClick={() => navigate('/new-jobs')}>
-              <NotificationsIcon />
-            </IconButton>
-
-            <IconButton color="inherit" onClick={() => navigate('/saved-jobs')}>
-              <BookmarkIcon />
-            </IconButton>
-
-            <IconButton color="inherit" onClick={() => navigate('/messages')}>
-              <MessageIcon />
-            </IconButton>
-
-            <IconButton color="inherit" onClick={() => navigate('/manage-profile')}>
-              <Avatar alt="User Profile" src="/profile-pic.jpg" />
-            </IconButton>
-          </IconSection>
-        </Toolbar>
-      </NavBar>
-
-      <PageContainer>
-        {/* Left Side: Job Listings */}
-        <LeftSide highContrast={highContrast}>
-          <JobTitleBar highContrast={highContrast} onClick={() => setShowJobs(!showJobs)}>
+      <PageContainer aria-label="Search Jobs Page">
+        <LeftSide highContrast={highContrast} aria-label="Job Listings">
+          <JobTitleBar highContrast={highContrast} onClick={() => setShowJobs(!showJobs)} aria-label="Job Lists Toggle">
             <Typography variant="h6">Job Lists</Typography>
             <ArrowDropDownIcon style={{ transform: showJobs ? 'rotate(0deg)' : 'rotate(180deg)' }} />
           </JobTitleBar>
 
           {showJobs && jobs.length > 0 ? (
             jobs.map((job) => (
-              <JobItem key={job.id} onClick={() => handleJobSelect(job)}>
-                <JobLogo src={job.logo} alt={job.company} />
+              <JobItem key={job.id} onClick={() => handleJobSelect(job)} aria-label={`Job at ${job.company} for ${job.title}`}>
+                <JobLogo src={job.logo} alt={`${job.company} Logo`} />
                 <Box>
                   <Typography variant="h6">{job.title}</Typography>
                   <Typography variant="body2">{job.company}</Typography>
@@ -309,8 +223,7 @@ const SearchJobsPage = () => {
           ) : null}
         </LeftSide>
 
-        {/* Center Section: Job Description */}
-        <CenterSection highContrast={highContrast}>
+        <CenterSection highContrast={highContrast} aria-label="Job Description">
           {selectedJob ? (
             <>
               <Typography variant="h5">{selectedJob.title}</Typography>
@@ -320,45 +233,49 @@ const SearchJobsPage = () => {
               <Typography variant="body1" marginTop="0.5rem">
                 {selectedJob.description}
               </Typography>
-              <ApplyButton highContrast={highContrast} onClick={() => navigate('/job-application')}>Apply for the Job</ApplyButton>
+              <ApplyButton highContrast={highContrast} data-command="Apply for the Job" onClick={() => navigate('/job-application')} aria-label="Apply for the Job">
+                Apply for the Job
+              </ApplyButton>
             </>
           ) : (
             <Typography variant="body1">Select a job to see the details</Typography>
           )}
         </CenterSection>
 
-        {/* Right Side: User Profile and Skills */}
-        <RightSide highContrast={highContrast}>
-          <UserProfile>
+        <RightSide highContrast={highContrast} aria-label="User Profile and Skills">
+          <UserProfile aria-label="User Profile">
             <Avatar alt="User" src="https://via.placeholder.com/150" sx={{ width: 100, height: 100 }} />
             <Typography variant="h6" sx={{ textAlign: 'center' }}>{userName}</Typography>
             <Typography variant="body2" sx={{ textAlign: 'center' }}>{userRole}</Typography>
-            <Button variant="contained" color="primary" sx={{ marginTop: '1rem' }} onClick={() => navigate('/manage-profile')}>
+            <Button variant="contained" color="primary" sx={{ marginTop: '1rem' }} data-command="Edit Profile" onClick={() => navigate('/manage-profile')} aria-label="Edit Profile">
               Edit Profile
             </Button>
           </UserProfile>
 
-          <Box>
+          <Box aria-label="User Skills">
             <Typography variant="h6">Skills</Typography>
             <SkillBox>
               {userSkills.map((skill, index) => (
-                <SkillItem highContrast={highContrast} key={index}>{skill}</SkillItem>
+                <SkillItem highContrast={highContrast} key={index} aria-label={`Skill: ${skill}`}>
+                  {skill}
+                </SkillItem>
               ))}
             </SkillBox>
-            <CenteredButton highContrast={highContrast} onClick={() => navigate('/manage-profile')}>View Profile</CenteredButton>
+            <CenteredButton highContrast={highContrast} data-command="View Profile" onClick={() => navigate('/manage-profile')} aria-label="View Profile">
+              View Profile
+            </CenteredButton>
           </Box>
         </RightSide>
       </PageContainer>
 
-      {/* Accessibility Bar */}
-      <AccessibilityBar>
-        <Button variant="contained" onClick={toggleHighContrast} sx={{ marginRight: '1rem' }}>
+      <AccessibilityBar aria-label="Accessibility Options">
+        <Button variant="contained" data-command="Toggle" onClick={toggleHighContrast} sx={{ marginRight: '1rem' }} aria-label="Toggle High Contrast">
           Toggle High Contrast
         </Button>
-        <Button variant="contained" onClick={increaseFontSize} sx={{ marginRight: '1rem' }}>
+        <Button variant="contained" data-command="Increase Font Size" onClick={increaseFontSize} sx={{ marginRight: '1rem' }} aria-label="Increase Font Size">
           Increase Font Size
         </Button>
-        <Button variant="contained" onClick={decreaseFontSize}>
+        <Button variant="contained" data-command="Decrease Font Size" onClick={decreaseFontSize} aria-label="Decrease Font Size">
           Decrease Font Size
         </Button>
       </AccessibilityBar>
