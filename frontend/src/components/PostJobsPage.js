@@ -9,6 +9,7 @@ import { db } from '../firebase';
 import { doc, collection, addDoc, deleteDoc, updateDoc, getDocs } from 'firebase/firestore';
 import EmployerNavBar from './EmployerNavBar';
 
+
 const PageContainer = styled(Box)({
   display: 'flex',
   justifyContent: 'space-between',
@@ -194,7 +195,7 @@ const PostJobsPage = () => {
   };
 
   return (
-    <div style={{ fontSize: `${fontSize}px` }} lang="en">
+    <div style={{ fontSize: `${fontSize}px` }}>
       <EmployerNavBar activePage="Post Jobs" />
 
       <PageContainer>
@@ -207,21 +208,17 @@ const PostJobsPage = () => {
           </JobTitleBar>
 
           {jobs.map((job) => (
-            <JobItem
-              key={job.id}
-              onClick={() => handleJobSelect(job)}
-              aria-label={`Select job titled ${job.title}`}
-            >
+            <JobItem key={job.id} onClick={() => handleJobSelect(job)} aria-label={`Select job ${job.title}`}>
               <JobLogo src="https://via.placeholder.com/50" alt={`${job.company} logo`} />
               <Box>
                 <Typography variant="h6">{job.title}</Typography>
                 <Typography variant="body2">{job.company}</Typography>
                 <Typography variant="body2">{job.location}</Typography>
               </Box>
-              <IconButton onClick={() => handleDeleteJob(job)} aria-label={`Delete job titled ${job.title}`}>
+              <IconButton onClick={() => handleDeleteJob(job)} aria-label={`Delete job ${job.title}`}>
                 <DeleteIcon />
               </IconButton>
-              <IconButton onClick={() => handleJobSelect(job)} aria-label={`Edit job titled ${job.title}`}>
+              <IconButton onClick={() => handleJobSelect(job)} aria-label={`Edit job ${job.title}`}>
                 <EditIcon />
               </IconButton>
             </JobItem>
@@ -250,64 +247,62 @@ const PostJobsPage = () => {
             <Avatar alt="Employer" src="https://via.placeholder.com/150" sx={{ width: 100, height: 100 }} />
             <Typography variant="h6" sx={{ textAlign: 'center' }}>{employerInfo.companyName}</Typography>
             <Typography variant="body2" sx={{ textAlign: 'center' }}>{employerInfo.role}</Typography>
-            <Button variant="contained" color="primary" sx={{ marginTop: '1rem' }} onClick={() => navigate('/employer-manage-profile')} aria-label="Edit profile">
+            <Button variant="contained" color="primary" sx={{ marginTop: '1rem' }} data-command="Edit Profile" onClick={() => navigate('/employer-manage-profile')} aria-label="Edit profile">
               Edit Profile
             </Button>
           </UserProfile>
         </RightSide>
       </PageContainer>
 
-      <JobFormModal
-        open={openModal}
-        onClose={() => setOpenModal(false)}
-        aria-labelledby="add-job-modal-title"
-        aria-describedby="add-job-modal-description"
-      >
-        <Box sx={{ padding: '2rem', backgroundColor: 'white', borderRadius: '8px', boxShadow: 24 }}>
-          <Typography id="add-job-modal-title" variant="h6">Add New Job</Typography>
+      <JobFormModal open={openModal} onClose={() => setOpenModal(false)} aria-labelledby="add-job-modal">
+        <Box sx={{ padding: '2rem', backgroundColor: '#fff', borderRadius: '8px', width: '400px' }}>
+          <Typography variant="h6" gutterBottom id="add-job-modal">Add New Job</Typography>
           <TextField
             label="Job Title"
-            fullWidth
             value={newJob.title}
             onChange={(e) => setNewJob({ ...newJob, title: e.target.value })}
-            sx={{ marginBottom: '1rem' }}
+            fullWidth
+            margin="normal"
+            aria-label="Job Title"
           />
           <TextField
-            label="Company Name"
-            fullWidth
+            label="Company"
             value={newJob.company}
             onChange={(e) => setNewJob({ ...newJob, company: e.target.value })}
-            sx={{ marginBottom: '1rem' }}
+            fullWidth
+            margin="normal"
+            aria-label="Company Name"
           />
           <TextField
             label="Location"
-            fullWidth
             value={newJob.location}
             onChange={(e) => setNewJob({ ...newJob, location: e.target.value })}
-            sx={{ marginBottom: '1rem' }}
+            fullWidth
+            margin="normal"
+            aria-label="Job Location"
           />
           <TextField
-            label="Job Description"
-            fullWidth
-            multiline
-            rows={4}
+            label="Description"
             value={newJob.description}
             onChange={(e) => setNewJob({ ...newJob, description: e.target.value })}
-            sx={{ marginBottom: '1rem' }}
+            fullWidth
+            margin="normal"
+            aria-label="Job Description"
           />
-          <Button variant="contained" color="primary" fullWidth onClick={handleAddJob} aria-label="Add job">Add Job</Button>
+          <Button variant="contained" color="primary" fullWidth sx={{ marginTop: '1rem' }} onClick={handleAddJob} aria-label="Submit new job">
+            Add Job
+          </Button>
         </Box>
       </JobFormModal>
 
-      {/* Accessibility Bar */}
       <AccessibilityBar>
-        <Button onClick={toggleHighContrast} sx={{ margin: '0 1rem' }} aria-label="Toggle high contrast mode">
-          High Contrast {highContrast ? 'On' : 'Off'}
+        <Button variant="contained" onClick={toggleHighContrast} sx={{ marginRight: '1rem' }} aria-label="Toggle high contrast mode">
+          Toggle High Contrast
         </Button>
-        <Button onClick={increaseFontSize} sx={{ margin: '0 1rem' }} aria-label="Increase font size">
+        <Button variant="contained" onClick={increaseFontSize} sx={{ marginRight: '1rem' }} aria-label="Increase font size">
           Increase Font Size
         </Button>
-        <Button onClick={decreaseFontSize} sx={{ margin: '0 1rem' }} aria-label="Decrease font size">
+        <Button variant="contained" onClick={decreaseFontSize} aria-label="Decrease font size">
           Decrease Font Size
         </Button>
       </AccessibilityBar>

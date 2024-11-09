@@ -1,3 +1,4 @@
+// src/components/LearningResources.js
 import React, { useState, useEffect } from 'react';
 import { Container, Typography, Select, MenuItem, Box, List, ListItem, ListItemText, CircularProgress, Alert } from '@mui/material';
 import { collection, query, where, getDocs } from 'firebase/firestore';
@@ -11,11 +12,7 @@ const LearningResources = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetchResources(category);
-    document.title = category ? `${category} Resources` : 'Learning Resources';
-  }, [category]);
-
+  // Fetch resources based on the selected category
   const fetchResources = async (selectedCategory) => {
     setLoading(true);
     setError(null);
@@ -41,12 +38,16 @@ const LearningResources = () => {
     }
   };
 
+  // Trigger fetching resources when the category changes
+  useEffect(() => {
+    fetchResources(category);
+  }, [category]);
+
   return (
     <div>
-      <a href="#main-content" className="skip-link">Skip to main content</a>
       <UserNavBar activePage="Learning Resources" />
-      <Container maxWidth="md" id="main-content" sx={{ textAlign: 'center', marginTop: '2rem' }}>
-        <Typography variant="h4" component="h1" gutterBottom>Learning Resources</Typography>
+      <Container maxWidth="md" sx={{ textAlign: 'center', marginTop: '2rem' }}>
+        <Typography variant="h4" gutterBottom>Learning Resources</Typography>
         <Typography variant="h6">Choose a Learning Category</Typography>
         
         <Select
@@ -58,7 +59,7 @@ const LearningResources = () => {
         >
           {categories.map((cat) => (
             <MenuItem key={cat} value={cat}>
-              <Typography>{cat}</Typography>
+              {cat}
             </MenuItem>
           ))}
         </Select>
@@ -69,18 +70,18 @@ const LearningResources = () => {
           ) : error ? (
             <Alert severity="error">{error}</Alert>
           ) : resources.length > 0 ? (
-            <List component="ul" sx={{ width: '100%', maxWidth: 600, textAlign: 'left' }}>
+            <List sx={{ width: '100%', maxWidth: 600, textAlign: 'left' }}>
               {resources.map((resource) => (
                 <ListItem key={resource.id} divider>
                   <ListItemText
-                    primary={<Typography variant="h6">{resource.title}</Typography>}
+                    primary={<Typography variant="h6" align="center">{resource.title}</Typography>}
                     secondary={
-                      <Box>
+                      <Box sx={{ textAlign: 'center' }}>
                         <Typography variant="body2" color="text.secondary">
                           {resource.description}
                         </Typography>
                         <a href={resource.url} target="_blank" rel="noopener noreferrer">
-                          Access Resource
+                          {resource.url}
                         </a>
                       </Box>
                     }

@@ -12,8 +12,7 @@ const Root = styled('div')({
   justifyContent: 'center',
   alignItems: 'center',
   minHeight: '100vh',
-  backgroundColor: '#f0f4f8',
-  direction: 'ltr', // Ensure text direction is set
+  backgroundColor: '#f0f4f8',  
 });
 
 const FormContainer = styled(Container)({
@@ -73,13 +72,8 @@ const UserLogin = () => {
 
   return (
     <Root>
-      <a href="#main-content" style={{ position: 'absolute', top: 0, left: 0 }}>
-        Skip to content
-      </a>
-      <FormContainer maxWidth="xs" id="main-content">
-        <Title variant="h4" component="h1">
-          User Login
-        </Title>
+      <FormContainer maxWidth="xs">
+        <Title variant="h4">User Login</Title>
         <form onSubmit={handleLogin}>
           <Input
             label="Email"
@@ -87,7 +81,6 @@ const UserLogin = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            inputProps={{ 'aria-label': 'Enter your email' }}
           />
           <Input
             label="Password"
@@ -96,27 +89,14 @@ const UserLogin = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            inputProps={{ 'aria-label': 'Enter your password' }}
           />
-          <SubmitButton type="submit" aria-label="Login">
-            Login
-          </SubmitButton>
+          <SubmitButton type="submit">Login</SubmitButton>
           {error && <Typography color="error">{error}</Typography>}
         </form>
-        <LinkBox
-          onClick={() => navigate('/reset-password?role=user')}
-          role="link"
-          tabIndex={0}
-          aria-label="Forgot password? Click to reset."
-        >
+        <LinkBox onClick={() => navigate('/reset-password?role=user')}>
           Forgot password?
         </LinkBox>
-        <LinkBox
-          onClick={() => navigate('/register')}
-          role="link"
-          tabIndex={0}
-          aria-label="Don't have an account? Click to create one."
-        >
+        <LinkBox onClick={() => navigate('/register')}>
           Don't have an account? Create one
         </LinkBox>
       </FormContainer>

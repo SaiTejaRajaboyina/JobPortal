@@ -175,6 +175,7 @@ const ManageApplicationsPage = () => {
 
 export default ManageApplicationsPage;
 */
+
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebase'; // Adjust the path to your Firebase config
 import { collection, getDocs, doc, updateDoc } from 'firebase/firestore';
@@ -228,35 +229,28 @@ const ManageApplications = () => {
   };
 
   return (
-    <div className="manage-applications-page" dir="ltr"> {/* Set dir attribute for text direction */}
-      <EmployerNavBar activePage={'Manage Applications'} />
+    <div className="manage-applications-page">
+      <EmployerNavBar activePage={'Manage Applications'}/>
 
-      <nav>
-        {/* Skip to content link for keyboard navigation */}
-        <a href="#main-content" className="skip-to-content-link">Skip to content</a>
-      </nav>
-
-      <main id="main-content" className="applications-container" style={{ display: 'flex', padding: '20px' }}>
+      <div className="applications-container" style={{ display: 'flex', padding: '20px' }}>
         {/* Left Section: Application List */}
-        <section className="application-list" style={{ width: '30%', marginRight: '20px', border: '1px solid #ddd', padding: '10px', overflowY: 'scroll', height: '80vh' }}>
-          <h2>Applications</h2>
-          <ul role="list"> {/* Mark the list of applications with <ul> */}
-            {applications.map((app) => (
-              <li key={app.id} onClick={() => selectApplication(app)} style={{ padding: '10px', cursor: 'pointer', borderBottom: '1px solid #ccc' }}>
-                <h3>{app.firstName} {app.lastName}</h3>
-                <p><strong>Job Title:</strong> {app.jobTitle}</p>
-                <p><strong>Date:</strong> {new Date(app.date).toLocaleDateString()}</p>
-                <p><strong>Status:</strong> {app.status || 'Pending'}</p>
-              </li>
-            ))}
-          </ul>
-        </section>
+        <div className="application-list" style={{ width: '30%', marginRight: '20px', border: '1px solid #ddd', padding: '10px', overflowY: 'scroll', height: '80vh' }}>
+          <h3>Applications</h3>
+          {applications.map((app) => (
+            <div key={app.id} onClick={() => selectApplication(app)} style={{ padding: '10px', cursor: 'pointer', borderBottom: '1px solid #ccc' }}>
+              <h4>{app.firstName} {app.lastName}</h4>
+              <p>Job Title: {app.jobTitle}</p>
+              <p>Date: {new Date(app.date).toLocaleDateString()}</p>
+              <p>Status: {app.status || 'Pending'}</p>
+            </div>
+          ))}
+        </div>
 
         {/* Right Section: Application Details */}
-        <section className="application-details" style={{ width: '70%', border: '1px solid #ddd', padding: '10px' }}>
+        <div className="application-details" style={{ width: '70%', border: '1px solid #ddd', padding: '10px' }}>
           {selectedApplication ? (
             <>
-              <h2>Application Details</h2>
+              <h3>Application Details</h3>
               <p><strong>Name:</strong> {selectedApplication.firstName} {selectedApplication.lastName}</p>
               <p><strong>Job Title:</strong> {selectedApplication.jobTitle}</p>
               <p><strong>Date Applied:</strong> {new Date(selectedApplication.date).toLocaleDateString()}</p>
@@ -264,19 +258,19 @@ const ManageApplications = () => {
               <p><strong>Address:</strong> {selectedApplication.address}</p>
               <p><strong>Company:</strong> {selectedApplication.company}</p>
               <p><strong>Country:</strong> {selectedApplication.country}</p>
-
+              
               {/* Action Buttons for Status Update */}
               <div style={{ marginTop: '20px' }}>
-                <button onClick={() => updateStatus('Reviewed')} aria-label="Mark as Reviewed">Mark as Reviewed</button>
-                <button onClick={() => updateStatus('Accepted')} style={{ marginLeft: '10px' }} aria-label="Accept application">Accept</button>
-                <button onClick={() => updateStatus('Rejected')} style={{ marginLeft: '10px' }} aria-label="Reject application">Reject</button>
+                <button onClick={() => updateStatus('Reviewed')}>Mark as Reviewed</button>
+                <button onClick={() => updateStatus('Accepted')} style={{ marginLeft: '10px' }}>Accept</button>
+                <button onClick={() => updateStatus('Rejected')} style={{ marginLeft: '10px' }}>Reject</button>
               </div>
             </>
           ) : (
             <p>Select an application to view details</p>
           )}
-        </section>
-      </main>
+        </div>
+      </div>
     </div>
   );
 };

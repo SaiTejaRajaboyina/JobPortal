@@ -6,12 +6,12 @@ import { db } from '../firebase';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 
-const DashboardContainer = styled(Container)(({ theme }) => ({
+const DashboardContainer = styled(Container)({
   padding: '2rem',
   maxWidth: 'md',
   textAlign: 'center',
   marginTop: '1rem',
-}));
+});
 
 const EmployerSkillAssessmentDashboard = () => {
   const [skillCategories] = useState(['JavaScript', 'Python', 'React', 'Node.js', 'CSS', 'HTML']);
@@ -53,15 +53,11 @@ const EmployerSkillAssessmentDashboard = () => {
   };
 
   return (
-    <div dir="ltr"> {/* Adding the dir attribute for left-to-right text direction */}
-      {/* Skip to content link for keyboard users */}
-      <a href="#content" style={{ position: 'absolute', top: '-40px', left: '-40px', zIndex: -1 }}></a>
-
+    <div>
       <EmployerNavBar activePage="Skill Assessment" />
-      
-      <DashboardContainer id="content">
+      <DashboardContainer>
         <Typography variant="h4" gutterBottom>Employer Skill Assessment Dashboard</Typography>
-
+        
         <Typography variant="h6" gutterBottom id="category-select-label">Choose a Skill Category</Typography>
         <Select
           value={selectedCategory}
@@ -77,6 +73,7 @@ const EmployerSkillAssessmentDashboard = () => {
           ))}
         </Select>
 
+        {/* Button to manage questions */}
         <Button
           variant="outlined"
           color="primary"
@@ -88,6 +85,7 @@ const EmployerSkillAssessmentDashboard = () => {
           Manage Questions
         </Button>
 
+        {/* User Results Table */}
         {loading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '2rem' }}>
             <CircularProgress aria-label="Loading user assessment results" aria-live="assertive" />

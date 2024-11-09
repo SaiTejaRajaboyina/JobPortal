@@ -35,20 +35,6 @@ const AccessibilityBar = styled(Box)({
   zIndex: 1000,
 });
 
-const SkipLink = styled('a')({
-  position: 'absolute',
-  top: '-40px',
-  left: '0',
-  backgroundColor: '#000',
-  color: '#fff',
-  padding: '8px',
-  textDecoration: 'none',
-  zIndex: '100',
-  '&:focus': {
-    top: '0',
-  },
-});
-
 const UserHomePage = () => {
   const navigate = useNavigate();
   const [highContrast, setHighContrast] = useState(false);
@@ -73,8 +59,6 @@ const UserHomePage = () => {
 
   return (
     <div
-      dir="ltr"
-      lang="en"
       style={{
         fontSize: 'var(--app-font-size)',
         backgroundColor: highContrast ? '#000' : '#f0f4f8',
@@ -82,35 +66,21 @@ const UserHomePage = () => {
       }}
       aria-label="User Home Page"
     >
-      <SkipLink href="#main-content">Skip to Content</SkipLink>
       <UserNavBar activePage="Home" />
 
-      <Container id="main-content">
-        <nav aria-label="Breadcrumb Navigation">
-          <ul>
-            <li>
-              <a href="/" aria-label="Home Page">Home</a>
-            </li>
-            <li aria-current="page">Inclusive Job Portal</li>
-          </ul>
-        </nav>
-
+      <Container>
         <CenteredBox highContrast={highContrast}>
           <Typography variant="h4" gutterBottom aria-label="Welcome Message">
             Welcome to the Inclusive Job Portal
           </Typography>
-          <Typography
-            variant="body1"
-            paragraph
-            aria-label="Description of the Inclusive Job Portal"
-          >
-            The <abbr title="Inclusive Job Portal">IJP</abbr> is designed to make job hunting
-            accessible to everyone. Whether you're a job seeker or an employer, we provide tools
-            that ensure a seamless experience.
+          <Typography variant="body1" paragraph aria-label="Description of the Inclusive Job Portal">
+            The Inclusive Job Portal is designed to make job hunting accessible to everyone.
+            Whether you're a job seeker or an employer, we provide tools that ensure a seamless experience.
           </Typography>
           <GetStartedButton
             highContrast={highContrast}
             aria-label="Get Started with Job Search"
+            data-command="Get Started"
             onClick={() => navigate('/search-jobs-input')}
           >
             Get Started
@@ -118,10 +88,12 @@ const UserHomePage = () => {
         </CenteredBox>
       </Container>
 
+      {/* Accessibility Bar */}
       <AccessibilityBar aria-label="Accessibility Options">
         <Button
           variant="contained"
           aria-label="Toggle High Contrast Mode"
+          data-command="Toggle"
           onClick={toggleHighContrast}
           sx={{ marginRight: '1rem' }}
         >
@@ -130,6 +102,7 @@ const UserHomePage = () => {
         <Button
           variant="contained"
           aria-label="Increase Font Size"
+          data-command="Increase Font Size"
           onClick={increaseFontSize}
           sx={{ marginRight: '1rem' }}
         >
@@ -138,6 +111,7 @@ const UserHomePage = () => {
         <Button
           variant="contained"
           aria-label="Decrease Font Size"
+          data-command="Decrease Font Size"
           onClick={decreaseFontSize}
         >
           Decrease Font Size

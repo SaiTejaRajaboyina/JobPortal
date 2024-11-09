@@ -41,36 +41,24 @@ const ShortlistedCandidates = () => {
   }, []);
 
   return (
-    <div className="shortlisted-candidates-page" lang="en">
-      <EmployerNavBar activePage={'Shortlisted Candidates'} />
+    <div className="shortlisted-candidates-page">
+      <EmployerNavBar activePage={'Shortlisted Candidates'}/>
 
-      <main className="candidates-container" style={{ padding: '20px' }}>
-        <h2>Shortlisted Candidates</h2>
-
-        {/* Check if there are candidates */}
+      <div className="candidates-container" style={{ padding: '20px' }}>
+        <h3>Shortlisted Candidates</h3>
         {candidates.length > 0 ? (
-          <ul role="list">
-            {candidates.map((candidate) => (
-              <li key={candidate.id} style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>
-                <p><strong>Name:</strong> {candidate.firstName} {candidate.lastName}</p>
-                <p><strong>Job Title:</strong> {candidate.jobTitle}</p>
-                <p><strong>Email:</strong> {candidate.email}</p>
-
-                {/* Ensure buttons are accessible via keyboard */}
-                <button 
-                  onClick={() => sendInterviewLink(candidate)} 
-                  onKeyDown={(e) => e.key === 'Enter' && sendInterviewLink(candidate)} 
-                  aria-label={`Send interview link to ${candidate.firstName} ${candidate.lastName}`}
-                >
-                  Send Interview Link
-                </button>
-              </li>
-            ))}
-          </ul>
+          candidates.map((candidate) => (
+            <div key={candidate.id} style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>
+              <p><strong>Name:</strong> {candidate.firstName} {candidate.lastName}</p>
+              <p><strong>Job Title:</strong> {candidate.jobTitle}</p>
+              <p><strong>Email:</strong> {candidate.email}</p>
+              <button onClick={() => sendInterviewLink(candidate)}>Send Interview Link</button>
+            </div>
+          ))
         ) : (
           <p>No shortlisted candidates available.</p>
         )}
-      </main>
+      </div>
     </div>
   );
 };

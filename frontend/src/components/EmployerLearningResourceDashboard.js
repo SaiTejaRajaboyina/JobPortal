@@ -4,24 +4,18 @@ import { Container, Typography, Button, Select, MenuItem, Snackbar, Alert } from
 import { styled } from '@mui/material/styles';
 import EmployerNavBar from './EmployerNavBar';  // Employer's navigation bar
 
-// Styled container for the dashboard
-const DashboardContainer = styled(Container)(({ theme }) => ({
+const DashboardContainer = styled(Container)({
   padding: '2rem',
   maxWidth: 'md',
   textAlign: 'center',
-  [theme.breakpoints.up('sm')]: {
-    marginTop: '1rem',
-  },
-}));
+});
 
-// The main dashboard component
 const EmployerLearningResourceDashboard = () => {
   const categories = ['JavaScript', 'Python', 'React', 'Node.js', 'CSS', 'HTML']; // Sample categories
   const [selectedCategory, setSelectedCategory] = useState('');
   const [feedback, setFeedback] = useState({ open: false, message: '', severity: 'info' });
   const navigate = useNavigate();
 
-  // Function to handle navigating to resource management page
   const viewResources = () => {
     if (selectedCategory) {
       navigate('/add-resources', { state: { category: selectedCategory } });
@@ -32,32 +26,25 @@ const EmployerLearningResourceDashboard = () => {
   };
 
   return (
-    <div dir="ltr"> {/* Adding the dir attribute to the body for left-to-right text direction */}
-      {/* Skip to content link for keyboard users */}
-      <a href="#content" style={{ position: 'absolute', top: '-40px', left: '-40px', zIndex: -1 }}></a>
+    <div>
+      <EmployerNavBar activePage="Learning Resources" />  {/* Active page indication */}
       
-      <EmployerNavBar activePage="Learning Resources" /> {/* Active page indication */}
-      
-      <DashboardContainer id="content"> {/* Ensure "content" ID for accessibility */}
+      <DashboardContainer>
         <Typography variant="h4" gutterBottom>Manage Learning Resources</Typography>
         <Typography variant="h6">Choose a Category to Add Resources</Typography>
         
-        {/* List of categories marked semantically */}
-        <ul style={{ padding: 0, listStyleType: 'none' }}>
-          <Select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            fullWidth
-            sx={{ margin: '1rem 0' }}
-            aria-label="Select category for learning resources"
-          >
-            {categories.map((category) => (
-              <MenuItem key={category} value={category}>{category}</MenuItem>
-            ))}
-          </Select>
-        </ul>
+        <Select
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value)}
+          fullWidth
+          sx={{ margin: '1rem 0' }}
+          aria-label="Select category for learning resources"
+        >
+          {categories.map((category) => (
+            <MenuItem key={category} value={category}>{category}</MenuItem>
+          ))}
+        </Select>
 
-        {/* View Resources Button */}
         <Button
           variant="contained"
           color="primary"

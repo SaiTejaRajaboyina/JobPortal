@@ -4,15 +4,7 @@ import React, { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase';
 import { useNavigate } from 'react-router-dom';
-import {
-  Container,
-  TextField,
-  Button,
-  Typography,
-  Box,
-  Alert,
-  CssBaseline,
-} from '@mui/material';
+import { Container, TextField, Button, Typography, Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 const Root = styled('div')({
@@ -20,7 +12,7 @@ const Root = styled('div')({
   justifyContent: 'center',
   alignItems: 'center',
   minHeight: '100vh',
-  backgroundColor: '#f0f4f8',
+  backgroundColor: '#f0f4f8',  
 });
 
 const FormContainer = styled(Container)({
@@ -74,70 +66,41 @@ const EmployerLogin = () => {
       await signInWithEmailAndPassword(auth, email, password);
       navigate('/employer-home');
     } catch (err) {
-      setError('Invalid email or password. Please try again.');
+      setError(err.message);
     }
   };
 
   return (
-    <>
-      <CssBaseline />
-      <Root>
-        <FormContainer maxWidth="xs">
-          <Title variant="h4" component="h1">
-            Employer Login
-          </Title>
-          <form onSubmit={handleLogin} aria-label="Employer Login Form">
-            <Input
-              label="Email"
-              variant="outlined"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              inputProps={{
-                'aria-label': 'Email Address',
-                'aria-required': 'true',
-              }}
-            />
-            <Input
-              label="Password"
-              type="password"
-              variant="outlined"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              inputProps={{
-                'aria-label': 'Password',
-                'aria-required': 'true',
-              }}
-            />
-            <SubmitButton type="submit" aria-label="Login">
-              Login
-            </SubmitButton>
-            {error && (
-              <Alert severity="error" role="alert">
-                {error}
-              </Alert>
-            )}
-          </form>
-          <LinkBox
-            role="link"
-            tabIndex={0}
-            onClick={() => navigate('/employer-reset-password?role=employer')}
-            aria-label="Reset Password"
-          >
-            Forgot password?
-          </LinkBox>
-          <LinkBox
-            role="link"
-            tabIndex={0}
-            onClick={() => navigate('/employer-register')}
-            aria-label="Register New Account"
-          >
-            Don't have an account? Create one
-          </LinkBox>
-        </FormContainer>
-      </Root>
-    </>
+    <Root>
+      <FormContainer maxWidth="xs">
+        <Title variant="h4">Employer Login</Title>
+        <form onSubmit={handleLogin}>
+          <Input
+            label="Email"
+            variant="outlined"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <Input
+            label="Password"
+            type="password"
+            variant="outlined"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <SubmitButton type="submit">Login</SubmitButton>
+          {error && <Typography color="error">{error}</Typography>}
+        </form>
+        <LinkBox onClick={() => navigate('/employer-reset-password?role=employer')}>
+          Forgot password?
+        </LinkBox>
+        <LinkBox onClick={() => navigate('/employer-register')}>
+          Don't have an account? Create one
+        </LinkBox>
+      </FormContainer>
+    </Root>
   );
 };
 
