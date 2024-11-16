@@ -180,12 +180,18 @@ const EmployerManageProfilePage = () => {
   }
 
   return (
-    <div>
+    <div dir="ltr"> {/* Ensure text directionality is properly handled */}
       <EmployerNavBar activePage="Manage Profile" />
       <PageContainer>
         <ProfileSection aria-labelledby="profile-header">
-          <Avatar src={employerData.photoURL} sx={{ width: 100, height: 100, margin: 'auto' }} />
-          <Typography id="profile-header" variant="h6" sx={{ marginTop: '1rem' }}>{employerData.companyName}</Typography>
+          <Avatar
+            src={employerData.photoURL}
+            sx={{ width: 100, height: 100, margin: 'auto' }}
+            alt="Profile photo"
+          />
+          <Typography id="profile-header" variant="h6" sx={{ marginTop: '1rem' }}>
+            {employerData.companyName}
+          </Typography>
           {isEditingTopSection ? (
             <>
               <TextField
@@ -220,44 +226,129 @@ const EmployerManageProfilePage = () => {
                 margin="normal"
                 aria-label="Role"
               />
-              <SaveButton variant="contained" data-command="Top Save" onClick={handleSaveTopSection}>Save</SaveButton>
+              <SaveButton variant="contained" data-command="Top Save" onClick={handleSaveTopSection}>
+                Save
+              </SaveButton>
             </>
           ) : (
             <>
-              <Typography variant="body1"><strong>Company Name:</strong> {employerData.companyName}</Typography>
-              <Typography variant="body1"><strong>Contact Person:</strong> {`${employerData.firstName} ${employerData.lastName}`}</Typography>
-              <Typography variant="body1"><strong>Role:</strong> {employerData.role}</Typography>
-              <Button variant="contained" data-command="Top Edit" onClick={handleEditTopSection} sx={{ marginTop: '1rem' }}>Edit</Button>
+              <Typography variant="body1">
+                <strong>Company Name:</strong> {employerData.companyName}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Contact Person:</strong> {`${employerData.firstName} ${employerData.lastName}`}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Role:</strong> {employerData.role}
+              </Typography>
+              <Button
+                variant="contained"
+                data-command="Top Edit"
+                onClick={handleEditTopSection}
+                sx={{ marginTop: '1rem' }}
+              >
+                Edit
+              </Button>
             </>
           )}
         </ProfileSection>
 
-        <ProfileSection>
+        <ProfileSection aria-labelledby="profile-header-bottom">
+          <Typography id="profile-header-bottom" variant="h6">
+            Contact Information
+          </Typography>
           {isEditingBottomSection ? (
             <>
-              <TextField label="Phone" value={bottomSectionData.phone} onChange={(e) => setBottomSectionData({ ...bottomSectionData, phone: e.target.value })} fullWidth margin="normal" aria-label="Phone" />
-              <TextField label="Address" value={bottomSectionData.address} onChange={(e) => setBottomSectionData({ ...bottomSectionData, address: e.target.value })} fullWidth margin="normal" aria-label="Address" />
-              <TextField label="State" value={bottomSectionData.state} onChange={(e) => setBottomSectionData({ ...bottomSectionData, state: e.target.value })} fullWidth margin="normal" aria-label="State" />
-              <TextField label="Country" value={bottomSectionData.country} onChange={(e) => setBottomSectionData({ ...bottomSectionData, country: e.target.value })} fullWidth margin="normal" aria-label="Country" />
-              <TextField label="Zip Code" value={bottomSectionData.zip} onChange={(e) => setBottomSectionData({ ...bottomSectionData, zip: e.target.value })} fullWidth margin="normal" aria-label="Zip Code" />
-              <TextField label="Description" value={bottomSectionData.description} onChange={(e) => setBottomSectionData({ ...bottomSectionData, description: e.target.value })} fullWidth margin="normal" aria-label="Description" />
-              <SaveButton variant="contained" data-command="Bottom Save" onClick={handleSaveBottomSection}>Save</SaveButton>
+              <TextField
+                label="Phone"
+                value={bottomSectionData.phone}
+                onChange={(e) => setBottomSectionData({ ...bottomSectionData, phone: e.target.value })}
+                fullWidth
+                margin="normal"
+                aria-label="Phone"
+              />
+              <TextField
+                label="Address"
+                value={bottomSectionData.address}
+                onChange={(e) => setBottomSectionData({ ...bottomSectionData, address: e.target.value })}
+                fullWidth
+                margin="normal"
+                aria-label="Address"
+              />
+              <TextField
+                label="State"
+                value={bottomSectionData.state}
+                onChange={(e) => setBottomSectionData({ ...bottomSectionData, state: e.target.value })}
+                fullWidth
+                margin="normal"
+                aria-label="State"
+              />
+              <TextField
+                label="Country"
+                value={bottomSectionData.country}
+                onChange={(e) => setBottomSectionData({ ...bottomSectionData, country: e.target.value })}
+                fullWidth
+                margin="normal"
+                aria-label="Country"
+              />
+              <TextField
+                label="Zip Code"
+                value={bottomSectionData.zip}
+                onChange={(e) => setBottomSectionData({ ...bottomSectionData, zip: e.target.value })}
+                fullWidth
+                margin="normal"
+                aria-label="Zip Code"
+              />
+              <TextField
+                label="Description"
+                value={bottomSectionData.description}
+                onChange={(e) => setBottomSectionData({ ...bottomSectionData, description: e.target.value })}
+                fullWidth
+                margin="normal"
+                multiline
+                rows={4}
+                aria-label="Description"
+              />
+              <SaveButton variant="contained" data-command="Bottom Save" onClick={handleSaveBottomSection}>
+                Save
+              </SaveButton>
             </>
           ) : (
             <>
-              <Typography variant="body1"><strong>Phone:</strong> {employerData.phone || 'Not Provided'}</Typography>
-              <Typography variant="body1"><strong>Address:</strong> {employerData.address || 'Not Provided'}</Typography>
-              <Typography variant="body1"><strong>State:</strong> {employerData.state || 'Not Provided'}</Typography>
-              <Typography variant="body1"><strong>Country:</strong> {employerData.country || 'Not Provided'}</Typography>
-              <Typography variant="body1"><strong>Zip Code:</strong> {employerData.zip || 'Not Provided'}</Typography>
-              <Typography variant="body1"><strong>Description:</strong> {employerData.description || 'Not Provided'}</Typography>
-              <Button variant="contained" data-command="Bottom Edit" onClick={handleEditBottomSection} sx={{ marginTop: '1rem' }}>Edit</Button>
+              <Typography variant="body1">
+                <strong>Phone:</strong> {employerData.phone}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Address:</strong> {employerData.address}
+              </Typography>
+              <Typography variant="body1">
+                <strong>State:</strong> {employerData.state}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Country:</strong> {employerData.country}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Zip Code:</strong> {employerData.zip}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Description:</strong> {employerData.description}
+              </Typography>
+              <Button
+                variant="contained"
+                data-command="Bottom Edit"
+                onClick={handleEditBottomSection}
+                sx={{ marginTop: '1rem' }}
+              >
+                Edit
+              </Button>
             </>
           )}
         </ProfileSection>
 
-        <Snackbar open={popupOpen} autoHideDuration={3000} onClose={handlePopupClose} aria-live="polite">
-          <Alert onClose={handlePopupClose} severity="success" sx={{ width: '100%' }}>Profile updated successfully!</Alert>
+        <Snackbar open={popupOpen} autoHideDuration={6000} onClose={handlePopupClose}>
+          <Alert onClose={handlePopupClose} severity="success" sx={{ width: '100%' }}>
+            Profile Updated Successfully!
+          </Alert>
         </Snackbar>
       </PageContainer>
     </div>

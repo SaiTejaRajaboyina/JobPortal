@@ -69,7 +69,7 @@ const EmployerHomePage = () => {
   };
 
   return (
-    <div style={{ fontSize: `${fontSize}px` }}>
+    <div style={{ fontSize: `${fontSize}px` }} dir="ltr">
       <EmployerNavBar activePage="Home" />
 
       <Container>
@@ -85,6 +85,7 @@ const EmployerHomePage = () => {
             data-command="Get Started" 
             onClick={handleGetStartedClick}
             aria-label="Get started by posting jobs"
+            title="Click to start posting jobs"
           >
             Get Started
           </GetStartedButton>
@@ -98,6 +99,7 @@ const EmployerHomePage = () => {
           onClick={toggleHighContrast} 
           sx={{ marginRight: '1rem' }}
           aria-label="Toggle high contrast mode"
+          title="Toggle high contrast mode for better visibility"
         >
           Toggle High Contrast
         </Button>
@@ -106,6 +108,7 @@ const EmployerHomePage = () => {
           onClick={increaseFontSize} 
           sx={{ marginRight: '1rem' }}
           aria-label="Increase font size"
+          title="Increase font size for better readability"
         >
           Increase Font Size
         </Button>
@@ -113,6 +116,7 @@ const EmployerHomePage = () => {
           variant="contained" 
           onClick={decreaseFontSize}
           aria-label="Decrease font size"
+          title="Decrease font size"
         >
           Decrease Font Size
         </Button>

@@ -7,7 +7,6 @@ import { styled } from '@mui/material/styles';
 import { collection, query, where, getDocs, doc, getDoc, setDoc } from 'firebase/firestore';
 import UserNavBar from './UserNavBar';
 
-
 const AssessmentContainer = styled(Container)({
   padding: '2rem',
   maxWidth: 'md',
@@ -17,7 +16,6 @@ const AssessmentContainer = styled(Container)({
   boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
   marginTop: '2rem',
 });
-
 
 const SkillAssessment = () => {
   const location = useLocation();
@@ -78,7 +76,6 @@ const SkillAssessment = () => {
     setSelectedOption('');
 
     if (currentQuestion === questions.length - 1) {
-      // Save result to Firestore
       const user = auth.currentUser;
       if (user) {
         const assessmentRef = doc(
@@ -86,10 +83,10 @@ const SkillAssessment = () => {
           'skillAssessments',
           `${user.uid}_${skillCategory}_${Date.now()}`
         );
-        
+
         await setDoc(assessmentRef, {
           userId: user.uid,
-          username: username,  // Include the username here
+          username: username,
           skillCategory: skillCategory,
           score: isCorrectAnswer ? score + 1 : score,
           totalQuestions: questions.length,
@@ -97,13 +94,13 @@ const SkillAssessment = () => {
         });
       }
 
-      navigate('/skills-assessments-result', { 
-        state: { 
-          score: isCorrectAnswer ? score + 1 : score, 
+      navigate('/skills-assessments-result', {
+        state: {
+          score: isCorrectAnswer ? score + 1 : score,
           total: questions.length,
           skillCategory,
           username
-        } 
+        }
       });
     } else {
       setCurrentQuestion(currentQuestion + 1);
@@ -121,11 +118,23 @@ const SkillAssessment = () => {
         ) : (
           questions[currentQuestion] && (
             <>
-              <Typography variant="h6">{questions[currentQuestion].question}</Typography>
-              
-              <RadioGroup value={selectedOption} onChange={handleOptionChange}>
+              <Typography variant="h6" id={`question-${currentQuestion}`}>
+                {questions[currentQuestion].question}
+              </Typography>
+
+              {/* Add aria-labelledby to RadioGroup */}
+              <RadioGroup
+                value={selectedOption}
+                onChange={handleOptionChange}
+                aria-labelledby={`question-${currentQuestion}`}
+              >
                 {questions[currentQuestion].options.map((option, index) => (
-                  <FormControlLabel key={index} value={option} control={<Radio />} label={option} />
+                  <FormControlLabel
+                    key={index}
+                    value={option}
+                    control={<Radio />}
+                    label={option}
+                  />
                 ))}
               </RadioGroup>
 

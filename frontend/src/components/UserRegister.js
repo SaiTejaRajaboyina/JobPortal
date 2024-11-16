@@ -53,6 +53,20 @@ const LinkBox = styled(Box)({
   },
 });
 
+const SkipLink = styled('a')({
+  position: 'absolute',
+  top: '-40px',
+  left: '0',
+  backgroundColor: '#000',
+  color: '#fff',
+  padding: '8px',
+  textDecoration: 'none',
+  zIndex: '100',
+  '&:focus': {
+    top: '0',
+  },
+});
+
 const UserRegister = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -85,14 +99,16 @@ const UserRegister = () => {
 
   return (
     <Root>
-      <FormContainer maxWidth="xs">
-        <Title variant="h4">Register as User</Title>
+      <SkipLink href="#main-content">Skip to content</SkipLink>
+      <FormContainer maxWidth="xs" id="main-content">
+        <Title component="h1" variant="h4">Register as User</Title>
         <form onSubmit={handleRegister}>
           <Input
             label="First Name"
             variant="outlined"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
+            inputProps={{ 'aria-label': 'First Name' }}
             required
           />
           <Input
@@ -100,6 +116,7 @@ const UserRegister = () => {
             variant="outlined"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
+            inputProps={{ 'aria-label': 'Last Name' }}
             required
           />
           <Input
@@ -107,6 +124,7 @@ const UserRegister = () => {
             variant="outlined"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            inputProps={{ 'aria-label': 'Email Address' }}
             required
           />
           <Input
@@ -115,10 +133,11 @@ const UserRegister = () => {
             variant="outlined"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            inputProps={{ 'aria-label': 'Password' }}
             required
           />
           <SubmitButton type="submit">Register</SubmitButton>
-          {error && <Typography color="error">{error}</Typography>}
+          {error && <Typography color="error" role="alert">{error}</Typography>}
         </form>
         <LinkBox onClick={() => navigate('/login')}>
           Already have an account? Login

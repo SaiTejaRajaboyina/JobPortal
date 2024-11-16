@@ -12,6 +12,7 @@ const Root = styled('div')({
   alignItems: 'center',
   minHeight: '100vh',
   backgroundColor: '#f0f4f8',
+  direction: 'ltr', // Explicit text direction
 });
 
 const FormContainer = styled(Container)({
@@ -19,6 +20,8 @@ const FormContainer = styled(Container)({
   backgroundColor: '#ffffff',
   borderRadius: '10px',
   boxShadow: '0 8px 16px rgba(0,0,0,0.1)',
+  width: '100%',
+  maxWidth: '400px', // Ensure the container is not too wide
 });
 
 const Title = styled(Typography)({
@@ -85,14 +88,17 @@ const EmployerRegister = () => {
   return (
     <Root>
       <FormContainer maxWidth="xs">
-        <Title variant="h4">Register as Employer</Title>
-        <form onSubmit={handleRegister}>
+        <Typography component="h1" variant="h4" id="register-title">
+          Register as Employer
+        </Typography>
+        <form onSubmit={handleRegister} aria-labelledby="register-title">
           <Input
             label="First Name"
             variant="outlined"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
             required
+            inputProps={{ 'aria-label': 'First Name' }}
           />
           <Input
             label="Last Name"
@@ -100,6 +106,7 @@ const EmployerRegister = () => {
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
             required
+            inputProps={{ 'aria-label': 'Last Name' }}
           />
           <Input
             label="Email"
@@ -107,6 +114,8 @@ const EmployerRegister = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            type="email"
+            inputProps={{ 'aria-label': 'Email' }}
           />
           <Input
             label="Password"
@@ -115,11 +124,32 @@ const EmployerRegister = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            inputProps={{
+              'aria-label': 'Password',
+              'aria-describedby': 'password-instruction',
+            }}
           />
+          <Typography
+            id="password-instruction"
+            variant="body2"
+            color="textSecondary"
+            component="p"
+          >
+            Password must be at least 8 characters long.
+          </Typography>
           <SubmitButton type="submit">Register</SubmitButton>
-          {error && <Typography color="error">{error}</Typography>}
+          {error && (
+            <Typography role="alert" color="error">
+              {error}
+            </Typography>
+          )}
         </form>
-        <LinkBox onClick={() => navigate('/employer-login')}>
+        <LinkBox
+          onClick={() => navigate('/employer-login')}
+          role="button"
+          tabIndex={0}
+          onKeyPress={(e) => e.key === 'Enter' && navigate('/employer-login')}
+        >
           Already have an account? Login
         </LinkBox>
       </FormContainer>
