@@ -1,6 +1,6 @@
 // src/components/UserLogin.js
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase';
 import { useNavigate } from 'react-router-dom';
@@ -12,7 +12,7 @@ const Root = styled('div')({
   justifyContent: 'center',
   alignItems: 'center',
   minHeight: '100vh',
-  backgroundColor: '#f0f4f8',  
+  backgroundColor: '#f0f4f8',
 });
 
 const FormContainer = styled(Container)({
@@ -58,10 +58,33 @@ const UserLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const navigate = useNavigate();
+
+  // Refs for managing focus when there's an error
+  const emailRef = useRef(null);
+  const passwordRef = useRef(null);
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    // Reset previous errors
+    setEmailError('');
+    setPasswordError('');
+
+    if (!email) {
+      setEmailError('Email is required');
+      emailRef.current?.focus();
+      return;
+    }
+
+    if (!password) {
+      setPasswordError('Password is required');
+      passwordRef.current?.focus();
+      return;
+    }
+
     try {
       await signInWithEmailAndPassword(auth, email, password);
       navigate('/home');
@@ -81,6 +104,11 @@ const UserLogin = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            inputRef={emailRef}
+            error={Boolean(emailError)}
+            helperText={emailError}
+            aria-invalid={Boolean(emailError)}
+            aria-describedby="email-error-text"
           />
           <Input
             label="Password"
@@ -89,14 +117,29 @@ const UserLogin = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            inputRef={passwordRef}
+            error={Boolean(passwordError)}
+            helperText={passwordError}
+            aria-invalid={Boolean(passwordError)}
+            aria-describedby="password-error-text"
           />
           <SubmitButton type="submit">Login</SubmitButton>
-          {error && <Typography color="error">{error}</Typography>}
+          {error && (
+            <Typography color="error" role="alert" aria-live="assertive">
+              {error}
+            </Typography>
+          )}
         </form>
-        <LinkBox onClick={() => navigate('/reset-password?role=user')}>
+        <LinkBox
+          onClick={() => navigate('/reset-password?role=user')}
+          aria-label="Forgot password"
+        >
           Forgot password?
         </LinkBox>
-        <LinkBox onClick={() => navigate('/register')}>
+        <LinkBox
+          onClick={() => navigate('/register')}
+          aria-label="Create a new account"
+        >
           Don't have an account? Create one
         </LinkBox>
       </FormContainer>

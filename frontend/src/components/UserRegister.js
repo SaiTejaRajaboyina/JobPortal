@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { auth, db } from '../firebase'; // Import db (Firestore)
+import { auth, db } from '../firebase';
 import { useNavigate } from 'react-router-dom';
 import { Container, TextField, Button, Typography, Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { doc, setDoc } from 'firebase/firestore'; // Firestore functions
+import { doc, setDoc } from 'firebase/firestore';
 
 const Root = styled('div')({
   display: 'flex',
@@ -59,10 +59,50 @@ const UserRegister = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [firstNameError, setFirstNameError] = useState('');
+  const [lastNameError, setLastNameError] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const navigate = useNavigate();
+
+  const firstNameRef = useRef(null);
+  const lastNameRef = useRef(null);
+  const emailRef = useRef(null);
+  const passwordRef = useRef(null);
 
   const handleRegister = async (e) => {
     e.preventDefault();
+
+    // Reset previous errors
+    setFirstNameError('');
+    setLastNameError('');
+    setEmailError('');
+    setPasswordError('');
+
+    if (!firstName) {
+      setFirstNameError('First Name is required');
+      firstNameRef.current?.focus();
+      return;
+    }
+
+    if (!lastName) {
+      setLastNameError('Last Name is required');
+      lastNameRef.current?.focus();
+      return;
+    }
+
+    if (!email) {
+      setEmailError('Email is required');
+      emailRef.current?.focus();
+      return;
+    }
+
+    if (!password) {
+      setPasswordError('Password is required');
+      passwordRef.current?.focus();
+      return;
+    }
+
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
@@ -94,6 +134,11 @@ const UserRegister = () => {
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
             required
+            inputRef={firstNameRef}
+            error={Boolean(firstNameError)}
+            helperText={firstNameError}
+            aria-invalid={Boolean(firstNameError)}
+            aria-describedby="firstName-error-text"
           />
           <Input
             label="Last Name"
@@ -101,6 +146,11 @@ const UserRegister = () => {
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
             required
+            inputRef={lastNameRef}
+            error={Boolean(lastNameError)}
+            helperText={lastNameError}
+            aria-invalid={Boolean(lastNameError)}
+            aria-describedby="lastName-error-text"
           />
           <Input
             label="Email"
@@ -108,6 +158,11 @@ const UserRegister = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            inputRef={emailRef}
+            error={Boolean(emailError)}
+            helperText={emailError}
+            aria-invalid={Boolean(emailError)}
+            aria-describedby="email-error-text"
           />
           <Input
             label="Password"
@@ -116,11 +171,20 @@ const UserRegister = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            inputRef={passwordRef}
+            error={Boolean(passwordError)}
+            helperText={passwordError}
+            aria-invalid={Boolean(passwordError)}
+            aria-describedby="password-error-text"
           />
           <SubmitButton type="submit">Register</SubmitButton>
-          {error && <Typography color="error">{error}</Typography>}
+          {error && (
+            <Typography color="error" role="alert" aria-live="assertive">
+              {error}
+            </Typography>
+          )}
         </form>
-        <LinkBox onClick={() => navigate('/login')}>
+        <LinkBox onClick={() => navigate('/login')} aria-label="Login">
           Already have an account? Login
         </LinkBox>
       </FormContainer>
