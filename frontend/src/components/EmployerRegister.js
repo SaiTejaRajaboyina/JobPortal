@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth, db } from '../firebase'; // Import Firestore
-import { doc, setDoc } from 'firebase/firestore'; // Firestore methods
+import React, { useState, useRef } from 'react';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { auth, db } from '../firebase';
 import { useNavigate } from 'react-router-dom';
 import { Container, TextField, Button, Typography, Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import { doc, setDoc } from 'firebase/firestore';
 
 const Root = styled('div')({
   display: 'flex',
@@ -59,24 +59,66 @@ const EmployerRegister = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [firstNameError, setFirstNameError] = useState('');
+  const [lastNameError, setLastNameError] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const navigate = useNavigate();
+
+  const firstNameRef = useRef(null);
+  const lastNameRef = useRef(null);
+  const emailRef = useRef(null);
+  const passwordRef = useRef(null);
 
   const handleRegister = async (e) => {
     e.preventDefault();
+
+    // Reset previous errors
+    setFirstNameError('');
+    setLastNameError('');
+    setEmailError('');
+    setPasswordError('');
+
+    if (!firstName) {
+      setFirstNameError('First Name is required');
+      firstNameRef.current?.focus();
+      return;
+    }
+
+    if (!lastName) {
+      setLastNameError('Last Name is required');
+      lastNameRef.current?.focus();
+      return;
+    }
+
+    if (!email) {
+      setEmailError('Email is required');
+      emailRef.current?.focus();
+      return;
+    }
+
+    if (!password) {
+      setPasswordError('Password is required');
+      passwordRef.current?.focus();
+      return;
+    }
+
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Save employer details to Firestore
+      // Update profile with the first and last name
+      await updateProfile(user, { displayName: `${firstName} ${lastName}` });
+
+      // Store employer details in Firestore
       await setDoc(doc(db, 'employers', user.uid), {
         firstName,
         lastName,
-        email,
-        role: 'employer', // Define role as 'employer'
-        createdAt: new Date(),
+        email: user.email,
+        role: 'employer',
       });
 
-      navigate('/employer-login');
+      navigate('/employer-login'); // Redirect to employer login page
     } catch (err) {
       setError(err.message);
     }
@@ -87,39 +129,71 @@ const EmployerRegister = () => {
       <FormContainer maxWidth="xs">
         <Title variant="h4">Register as Employer</Title>
         <form onSubmit={handleRegister}>
-          <Input
+          <TextField
             label="First Name"
             variant="outlined"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
             required
+            inputRef={firstNameRef}
+            error={Boolean(firstNameError)}
+            helperText={firstNameError}
+            aria-invalid={Boolean(firstNameError)}
+            aria-describedby="firstName-error-text"
+            fullWidth
+            margin="normal"
           />
-          <Input
+          <TextField
             label="Last Name"
             variant="outlined"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
             required
+            inputRef={lastNameRef}
+            error={Boolean(lastNameError)}
+            helperText={lastNameError}
+            aria-invalid={Boolean(lastNameError)}
+            aria-describedby="lastName-error-text"
+            fullWidth
+            margin="normal"
           />
-          <Input
+          <TextField
             label="Email"
             variant="outlined"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            inputRef={emailRef}
+            error={Boolean(emailError)}
+            helperText={emailError}
+            aria-invalid={Boolean(emailError)}
+            aria-describedby="email-error-text"
+            fullWidth
+            margin="normal"
           />
-          <Input
+          <TextField
             label="Password"
             type="password"
             variant="outlined"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            inputRef={passwordRef}
+            error={Boolean(passwordError)}
+            helperText={passwordError}
+            aria-invalid={Boolean(passwordError)}
+            aria-describedby="password-error-text"
+            fullWidth
+            margin="normal"
           />
           <SubmitButton type="submit">Register</SubmitButton>
-          {error && <Typography color="error">{error}</Typography>}
+          {error && (
+            <Typography color="error" role="alert" aria-live="assertive">
+              {error}
+            </Typography>
+          )}
         </form>
-        <LinkBox onClick={() => navigate('/employer-login')}>
+        <LinkBox onClick={() => navigate('/employer-login')} aria-label="Login">
           Already have an account? Login
         </LinkBox>
       </FormContainer>

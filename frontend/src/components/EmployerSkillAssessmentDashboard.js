@@ -57,8 +57,10 @@ const EmployerSkillAssessmentDashboard = () => {
       <EmployerNavBar activePage="Skill Assessment" />
       <DashboardContainer>
         <Typography variant="h4" gutterBottom>Employer Skill Assessment Dashboard</Typography>
-        
+        <label for="category-select">{/* Set the for attribute to link the label with the select element */}
+
         <Typography variant="h6" gutterBottom id="category-select-label">Choose a Skill Category</Typography>
+
         <Select
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
@@ -72,6 +74,8 @@ const EmployerSkillAssessmentDashboard = () => {
             <MenuItem key={index} value={category}>{category}</MenuItem>
           ))}
         </Select>
+        Choose a Skill Category
+        </label>
 
         {/* Button to manage questions */}
         <Button

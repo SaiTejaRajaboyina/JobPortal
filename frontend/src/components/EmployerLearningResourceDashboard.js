@@ -28,14 +28,19 @@ const EmployerLearningResourceDashboard = () => {
   return (
     <div>
       <EmployerNavBar activePage="Learning Resources" />  {/* Active page indication */}
-      
+
       <DashboardContainer>
         <Typography variant="h4" gutterBottom>Manage Learning Resources</Typography>
-        <Typography variant="h6">Choose a Category to Add Resources</Typography>
-        
+
+        {/* Correcting the label association */}
+        <label for="category-select"> {/* Set the for attribute to link the label with the select element */}
+          <Typography variant="h6">Choose a Category to Add Resources</Typography>
+        </label>
+
         <Select
+          id="category-select"  // Set the id to match the label's 
           value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
+          onChange={(e) => setSelectedCategory(e.target.value)}  // Corrected onChange handler
           fullWidth
           sx={{ margin: '1rem 0' }}
           aria-label="Select category for learning resources"

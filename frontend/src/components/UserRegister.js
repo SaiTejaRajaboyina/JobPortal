@@ -128,8 +128,8 @@ const UserRegister = () => {
       <FormContainer maxWidth="xs">
         <Title variant="h4">Register as User</Title>
         <form onSubmit={handleRegister}>
-          <Input
-            label="First Name"
+          <TextField
+            label="First Name" // Label for first name
             variant="outlined"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
@@ -139,9 +139,11 @@ const UserRegister = () => {
             helperText={firstNameError}
             aria-invalid={Boolean(firstNameError)}
             aria-describedby="firstName-error-text"
+            fullWidth
+            margin="normal"
           />
-          <Input
-            label="Last Name"
+          <TextField
+            label="Last Name" // Label for last name
             variant="outlined"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
@@ -151,9 +153,11 @@ const UserRegister = () => {
             helperText={lastNameError}
             aria-invalid={Boolean(lastNameError)}
             aria-describedby="lastName-error-text"
+            fullWidth
+            margin="normal"
           />
-          <Input
-            label="Email"
+          <TextField
+            label="Email" // Label for email
             variant="outlined"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -163,9 +167,11 @@ const UserRegister = () => {
             helperText={emailError}
             aria-invalid={Boolean(emailError)}
             aria-describedby="email-error-text"
+            fullWidth
+            margin="normal"
           />
-          <Input
-            label="Password"
+          <TextField
+            label="Password" // Label for password
             type="password"
             variant="outlined"
             value={password}
@@ -176,6 +182,8 @@ const UserRegister = () => {
             helperText={passwordError}
             aria-invalid={Boolean(passwordError)}
             aria-describedby="password-error-text"
+            fullWidth
+            margin="normal"
           />
           <SubmitButton type="submit">Register</SubmitButton>
           {error && (

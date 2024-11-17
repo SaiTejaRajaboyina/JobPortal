@@ -95,11 +95,12 @@ const UserLogin = () => {
     <Root>
       <FormContainer maxWidth="xs">
         <Title variant="h4" component="h1">User Login</Title>
-        <a href="#content" className="skip-link">Skip to content</a> {/* Skip to content link */}
         
         <form onSubmit={handleLogin}>
-          <Input
-            label="Email"
+          {/* Email Field with Label */}
+          <TextField
+            id="email"
+            label="Email" 
             variant="outlined"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -109,9 +110,14 @@ const UserLogin = () => {
             helperText={emailError}
             aria-invalid={Boolean(emailError)}
             aria-describedby="email-error-text"
+            fullWidth
+            margin="normal"
           />
-          <Input
-            label="Password"
+
+          {/* Password Field with Label */}
+          <TextField
+            id="password"
+            label="Password" 
             type="password"
             variant="outlined"
             value={password}
@@ -122,7 +128,10 @@ const UserLogin = () => {
             helperText={passwordError}
             aria-invalid={Boolean(passwordError)}
             aria-describedby="password-error-text"
+            fullWidth
+            margin="normal"
           />
+
           <SubmitButton type="submit">Login</SubmitButton>
           {error && (
             <Typography color="error" role="alert" aria-live="assertive">
