@@ -1,5 +1,3 @@
-// src/components/UserLogin.js
-
 import React, { useState, useRef } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase';
@@ -96,7 +94,9 @@ const UserLogin = () => {
   return (
     <Root>
       <FormContainer maxWidth="xs">
-        <Title variant="h4">User Login</Title>
+        <Title variant="h4" component="h1">User Login</Title>
+        <a href="#content" className="skip-link">Skip to content</a> {/* Skip to content link */}
+        
         <form onSubmit={handleLogin}>
           <Input
             label="Email"
@@ -130,18 +130,22 @@ const UserLogin = () => {
             </Typography>
           )}
         </form>
-        <LinkBox
-          onClick={() => navigate('/reset-password?role=user')}
-          aria-label="Forgot password"
-        >
-          Forgot password?
-        </LinkBox>
-        <LinkBox
-          onClick={() => navigate('/register')}
-          aria-label="Create a new account"
-        >
-          Don't have an account? Create one
-        </LinkBox>
+
+        <nav aria-label="Account management">
+          <LinkBox
+            onClick={() => navigate('/reset-password?role=user')}
+            aria-label="Forgot password"
+          >
+            Forgot password?
+          </LinkBox>
+          <LinkBox
+            onClick={() => navigate('/register')}
+            aria-label="Create a new account"
+          >
+            Don't have an account? Create one
+          </LinkBox>
+        </nav>
+
       </FormContainer>
     </Root>
   );
